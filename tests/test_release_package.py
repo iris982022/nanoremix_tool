@@ -11,6 +11,9 @@ ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location("source_release", ROOT / "tools/build_source_release.py")
 RELEASE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(RELEASE)
+VERIFY_SPEC = importlib.util.spec_from_file_location("verify_distribution", ROOT / "verification/verify_distribution.py")
+VERIFY = importlib.util.module_from_spec(VERIFY_SPEC)
+VERIFY_SPEC.loader.exec_module(VERIFY)
 
 
 def test_release_excludes_author_documents_and_weights(tmp_path):
@@ -18,8 +21,11 @@ def test_release_excludes_author_documents_and_weights(tmp_path):
     package = tmp_path / "release/NanoRemix"
     assert report["package_kind"] == "source_only"
     assert not report["pretrained_weights_included"]
-    assert sorted(path.name for path in (package / "docs").iterdir()) == [
-        "INPUTS.md", "MODELS.md", "OPTIONS.md", "README.zh-CN.md"]
+    assert (package / "docs/OVERVIEW.zh-CN.md").is_file()
+    assert (package / "docs/KNOWN_LIMITATIONS.zh-CN.md").is_file()
+    assert (package / "docs/guide_20261104/PIPELINE_命令与输入衔接.md").is_file()
+    assert (package / "upstream_reference/RNA004/assets/9mer_levels_v1.txt").is_file()
+    assert report["file_count"] <= 99
     assert not (package / "models").exists()
     assert not (package / ".git").exists()
     assert (package / ".github/workflows/tests.yml").is_file()
@@ -31,6 +37,18 @@ def test_release_excludes_author_documents_and_weights(tmp_path):
     assert json.loads((tmp_path / "release/source_package_manifest.json").read_text()) == report
     with pytest.raises(ValueError, match="already exists"):
         RELEASE.build(ROOT, tmp_path / "release")
+
+
+def test_built_distribution_integrity_and_tampering(tmp_path):
+    RELEASE.build(ROOT, tmp_path / "release")
+    package = tmp_path / "release/NanoRemix"
+    report = VERIFY.verify(package)
+    assert report["status"] == "PASS" and report["extra_files_count"] == 0
+    readme = package / "README.md"
+    readme.write_text(readme.read_text() + "\nChanged after packaging\n")
+    report = VERIFY.verify(package)
+    assert report["status"] == "FAIL"
+    assert {"path": "README.md", "error": "sha256_mismatch"} in report["errors"]
 
 
 def test_public_relative_document_links_resolve(tmp_path):

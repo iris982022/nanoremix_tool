@@ -1,7 +1,9 @@
 # Options
 
-Normal use needs `--input`, `--output`, `--task`, `--chemistry`,
-`--data-type` and `--mods`. The defaults are prepared feature input and strategy S2.
+Normal use needs `--input`, `--output` and `--task`; explicitly choose
+`--chemistry` when it cannot be inferred. Exactly one of `--mods` / `--targets`
+and exactly one of `--data-type` / `--mode` are required. The defaults are
+prepared feature input and strategy S2.
 Use `nanoremix predict --help` for the full command reference.
 
 ## Supported Modifications
@@ -63,7 +65,9 @@ Binary `selected_family_mass` is 1 for its pair; second-generation retained pair
 mass is reported separately. These are not biological modification fractions.
 Rejected observations may retain candidate scores but no accepted label.
 
-Coefficients are nonnegative with positive total weight. Binary fusion combines
+Both coefficients must be finite and strictly greater than zero in this CLI.
+Use an explicit `--mode` for single-generation output; zero weights are rejected.
+Binary fusion combines
 weighted log odds plus bias; Multi combines shared-class log probabilities.
 These defaults are not fitted from user data, and are not a claim to reproduce
 paper-specific calibration. Test labels are never used to fit parameters.

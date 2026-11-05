@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nanoremix"
-version = "0.3.0"
+version = "0.3.1"
 description = "Chemistry-aware RNA modification inference with explicit model provenance"
 readme = "README.md"
 requires-python = ">=3.10"

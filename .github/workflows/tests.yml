@@ -1,0 +1,47 @@
+name: Software validation
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  OMP_NUM_THREADS: "1"
+  OPENBLAS_NUM_THREADS: "1"
+  MKL_NUM_THREADS: "1"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python verification/verify_distribution.py
+      - run: python -m pip install -e '.[dev]'
+      - run: python -m pytest -q
+      - run: python -m build
+      - run: python tools/build_source_release.py --output-dir source-release
+      - run: python source-release/NanoRemix/verification/verify_distribution.py
+      - run: python examples/make_demo.py --output demo-input
+      - run: nanoremix predict --input demo-input/RNA004_multi.csv --task multi --input-kind probabilities --mods m6A,m5C,pseudoU --data-type synthetic --strategy both --output demo-output
+      - uses: actions/upload-artifact@v4
+        with:
+          name: software-smoke-${{ matrix.python }}
+          path: demo-output/run_manifest.json
+
+  original-adapter-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -e '.[dev,models]'
+      - run: python -m pytest -q

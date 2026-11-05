@@ -46,3 +46,57 @@ def test_readme_example_rejections_remain_auditable(tmp_path):
     assert audit.loc[1, "candidate_label"] == "A"
     assert pd.isna(audit.loc[1, "predicted_label"])
     assert not any(column.startswith("prob_") for column in audit.columns)
+
+
+def test_step6_positive_retains_center_identity_and_signal(tmp_path):
+    source = Path(__file__).resolve().parents[1] / "docs/guide_20261104/examples/RNA004_step6_positive.csv"
+    raw = pd.read_csv(source)
+    for i in range(1, 10):
+        raw[f"mean_output{i}"] = np.arange(len(raw)) * 100 + i
+    path, output = tmp_path / "step6.csv", tmp_path / "prepared.csv"
+    raw.to_csv(path, index=False)
+    assert main(["prepare", "--input", str(path), "--output", str(output),
+                 "--chemistry", "RNA004", "--format", "step6"]) == 0
+    prepared = pd.read_csv(output)
+    assert len(prepared) == len(raw) - 8
+    for _, candidate in prepared.iterrows():
+        original = raw.loc[raw.ref_start.eq(candidate.ref_start)].iloc[0]
+        assert candidate.read_id == original.read_id
+        assert candidate["9mer_final"].replace("_", "")[4:13].replace("U", "T") == original.sequence_input
+        for i in range(1, 10):
+            assert candidate[f"mean_output{i}"] == original[f"mean_output{i}"]
+
+
+def test_mixed_step6_strands_abort_without_partial_output(tmp_path, capsys):
+    examples = Path(__file__).resolve().parents[1] / "docs/guide_20261104/examples"
+    positive = pd.read_csv(examples / "RNA004_step6_positive.csv")
+    negative = pd.read_csv(examples / "RNA004_step6_negative_limitation.csv")
+    path, output = tmp_path / "mixed.csv", tmp_path / "prepared.csv"
+    pd.concat([positive, negative], ignore_index=True).to_csv(path, index=False)
+    assert main(["prepare", "--input", str(path), "--output", str(output),
+                 "--chemistry", "RNA004", "--format", "step6"]) == 2
+    assert "negative-strand rows" in capsys.readouterr().err
+    assert not output.exists()
+
+
+def test_step6_requires_explicit_valid_strand(tmp_path, capsys):
+    source = Path(__file__).resolve().parents[1] / "docs/guide_20261104/examples/RNA004_step6_positive.csv"
+    raw = pd.read_csv(source)
+    path, output = tmp_path / "step6.csv", tmp_path / "prepared.csv"
+    for frame in (raw.drop(columns="strand"), raw.assign(strand="unknown")):
+        frame.to_csv(path, index=False)
+        assert main(["prepare", "--input", str(path), "--output", str(output),
+                     "--chemistry", "RNA004", "--format", "step6"]) == 2
+        assert "strand" in capsys.readouterr().err
+        assert not output.exists()
+
+
+def test_step6_multiple_references_for_one_read_are_rejected(tmp_path, capsys):
+    source = Path(__file__).resolve().parents[1] / "docs/guide_20261104/examples/RNA004_step6_positive.csv"
+    raw = pd.read_csv(source)
+    path, output = tmp_path / "multiple.csv", tmp_path / "prepared.csv"
+    pd.concat([raw, raw.assign(ref_name="other-reference")], ignore_index=True).to_csv(path, index=False)
+    assert main(["prepare", "--input", str(path), "--output", str(output),
+                 "--chemistry", "RNA004", "--format", "step6"]) == 2
+    assert "multiple references" in capsys.readouterr().err
+    assert not output.exists()

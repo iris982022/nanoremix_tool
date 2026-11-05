@@ -1,10 +1,10 @@
 # 更新GitHub源码与主页
 
-目标仓库：https://github.com/iris982022/nanoremix_tool 。工具仍是v0.3.0；本次只更新文档和分发清单。
+目标仓库：https://github.com/iris982022/nanoremix_tool 。本次源码维护版为v0.3.1，修复分发、文档及旧Step6入口保护；继续使用v0.3.0 Release中的原始权重。
 
 ## 1. 上传哪些内容
 
-本次源码包为 `NanoRemix_v0.3.0_GitHub_READY_20261105.zip`，内部共99个文件。解压得到 `NanoRemix/`，把**文件夹内部的内容**放到仓库根目录，保留src、docs等目录；不要平铺所有子文件，也不要再套一层NanoRemix目录。
+本次源码包为 `NanoRemix_GitHub_source.zip`，内部共99个文件。解压得到 `NanoRemix/`，把**文件夹内部的内容**放到仓库根目录，保留src、docs等目录；不要平铺所有子文件，也不要再套一层NanoRemix目录。
 
 正确文件树包括：
 
@@ -45,16 +45,8 @@ Git没有网页上传器的100文件批次限制。重整结构会同时删除�
 
 只先改主页：打开根目录 **README.md → 铅笔 Edit this file**，用本次提供的README全文替换，然后 **Commit changes**。完整功能运行仍需修复目录并补齐模型下载。
 
-## 4. 权重继续作为Release附件
+## 4. 本次不重传模型
 
-进入 **Releases → Draft a new release**，选择正确main提交，创建或选择 `v0.3.0` 标签，附加下面五个原始ZIP，不要将解压权重放入源码仓库。
+五个权重ZIP已在 [v0.3.0 Release](https://github.com/iris982022/nanoremix_tool/releases/tag/v0.3.0) 发布，本维护版继续使用这些文件，不必重新上传或训练。不要改动现有v0.3.0标签；若发布v0.3.1源码版本，可在说明中链接原模型Release。
 
-| 附件 | 用途 |
-|---|---|
-| `NanoRemix_v0.3.0_models_RNA002_Binary_20261104.zip` | RNA002 Binary S1/S2 |
-| `NanoRemix_v0.3.0_models_RNA002_Multi_20261104.zip` | RNA002 Multi S1/S2 |
-| `NanoRemix_v0.3.0_models_RNA004_Binary_20261104.zip` | RNA004 Binary S1/S2 |
-| `NanoRemix_v0.3.0_models_RNA004_Multi_20261104.zip` | RNA004 Multi S1/S2 |
-| `NanoRemix_v0.3.0_models_SecondGen_20261104.zip` | 共享25个二代checkpoint及网络定义 |
-
-权重不变，继续使用20261104的原始附件及对应SHA256文本。纯三代下载对应chemistry/task包，现场序列融合再加SecondGen，已有二代概率无需SecondGen。下载者解压到项目根目录形成models。发布包没有mean/std/length消融权重；RNA004旧Step6负链限制仍存在，详见[已知限制](KNOWN_LIMITATIONS.zh-CN.md)。
+源码维护版v0.3.1恢复隐藏文件、修复打包和参数文档，并保护旧Step6入口；模型预测数学算法和权重不变。下载者仍按README只取所需chemistry/task模型包，现场执行二代再加SecondGen。RNA004负链通用适配尚未实现，详见[已知限制](KNOWN_LIMITATIONS.zh-CN.md)。

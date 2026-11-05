@@ -6,9 +6,9 @@
 
 Binary 与 Multi · 指定修饰筛选 · 纯三代与二代三代融合
 
-[English](../README.md) · [中文功能总览](OVERVIEW.zh-CN.md) · [输入格式](INPUTS.md) · [模型文件](MODELS.md) · [完整选项](OPTIONS.md)
+[主页完整说明](../README.md) · [中文功能总览](OVERVIEW.zh-CN.md) · [输入格式](INPUTS.md) · [模型文件](MODELS.md) · [完整选项](OPTIONS.md)
 
-**v0.3.0** · 配套预训练模型 · Python 3.10/3.11
+**v0.3.1** · 沿用v0.3.0预训练模型 · Python 3.10/3.11
 
 </div>
 
@@ -16,6 +16,8 @@ Binary 与 Multi · 指定修饰筛选 · 纯三代与二代三代融合
 > chemistry/task 对应的三代模型 ZIP；二代序列融合另加共享二代模型 ZIP。
 > 每个模型 ZIP 更小，仍包含原始推理需要的权重与校验索引，无须重新训练。
 > 安装方式见 [MODELS.md](MODELS.md)。
+
+v0.3.1恢复分发文件、修复源码打包和参数文档，并为RNA004旧Step6入口加入负链/方向检查；它没有实现通用负链预处理。详见[使用边界](KNOWN_LIMITATIONS.zh-CN.md)。
 
 ## 🧩 功能与输出规则
 

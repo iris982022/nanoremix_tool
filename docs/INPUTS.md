@@ -56,6 +56,14 @@ nanoremix prepare --input step6.csv --format step6 \
   --chemistry RNA004 --output prepared004.csv
 ```
 
+RNA004 Step6 conversion in v0.3.1 requires an explicit `strand` column
+containing only `+` or `-`. Any negative-strand row, including mixed-strand
+input, aborts before writing output because the legacy constructor cannot safely
+assemble its RNA-oriented context. Missing/invalid strand values and a read
+mapping to multiple references also fail explicitly. Use validated strand-aware
+prepared tables for negative-strand data; do not relabel or silently discard it.
+This guard does not implement a general strand-aware adapter.
+
 These reuse the original candidate constructors. They are not FAST5/POD5
 basecalling/event-alignment pipelines. Review the original extraction schema and
 normalization before calling them. Output is a prepared CSV; explicit 81-nt

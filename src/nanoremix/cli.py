@@ -118,7 +118,22 @@ def prepare(args):
         raw = io.read_step4_tsv(args.input) if args.format == "step4" else io.read_extracted_csv(args.input)
         table = features.generate_9mer_candidates(raw)
     elif k == 9 and args.format == "step6":
-        table = features.generate_17mer_candidates(io.read_step6_csv(args.input))
+        raw = io.read_step6_csv(args.input)
+        if "strand" not in raw:
+            raise ValueError("RNA004 step6 requires an explicit strand column (+/-); strand is never inferred")
+        strands = raw["strand"].astype(str).str.strip()
+        if not strands.isin(["+", "-"]).all():
+            raise ValueError("RNA004 step6 strand values must be + or -")
+        if strands.eq("-").any():
+            raise ValueError(
+                "RNA004 step6 contains negative-strand rows. The legacy converter cannot safely "
+                "assemble their RNA-oriented context; no prepared output was written. "
+                "Use a validated strand-aware prepared table; see docs/KNOWN_LIMITATIONS.zh-CN.md. "
+                "Do not relabel negative rows as positive."
+            )
+        if "ref_name" in raw and raw.groupby("read_id")["ref_name"].nunique().gt(1).any():
+            raise ValueError("RNA004 step6 read_id maps to multiple references; split alignments before conversion")
+        table = features.generate_17mer_candidates(raw)
     else:
         raise ValueError("RNA002 accepts step4/extracted; RNA004 accepts step6")
     output.parent.mkdir(parents=True, exist_ok=True)

@@ -2,11 +2,22 @@
 
 **RNA002 / RNA004 RNA修饰预测：Binary、Multi、纯三代及二代＋三代融合。**
 
-工具版本 **v0.3.0** · Python **3.10/3.11** · 主页说明更新 **2026-11-05**
+工具版本 **v0.3.1** · Python **3.10/3.11** · 主页说明更新 **2026-11-05**
 
 [快速运行](#quickstart) · [四套配置](#configurations) · [输入](#inputs) · [上游流程](#preprocessing) · [全部参数](#options) · [计算](#calculation) · [权重](#models) · [运行与输出](#examples)
 
-源码与权重分别分发。源码不含模型，运行特征推理前需从 [Releases](https://github.com/iris982022/nanoremix_tool/releases) 下载对应附件。首次可先跑无需权重的人工概率示例。本次只更新文档和分发清单，没有更换推理代码、重新训练或修改权重。
+源码与权重分别分发。源码不含模型，运行特征推理前需从 [Releases](https://github.com/iris982022/nanoremix_tool/releases) 下载对应附件。首次可先跑无需权重的人工概率示例。本次维护版恢复缺失文件，修复源码打包和参数说明，并为旧RNA004 Step6转换加输入保护。预测算法与权重不变；模型继续下载v0.3.0 Release的五个ZIP。
+
+
+
+### 本次维护版修复
+
+- 恢复 `.gitignore` 与自动测试workflow，并在CI检查分发完整性。
+- 统一必填参数、融合权重必须严格大于0及实际参数名 `--condition`。
+- 源码构建保留README引用的详细手册、上游脚本和示例；生成当前文件的完整性清单，精简源码仍为99个文件。
+- RNA004旧Step6转换遇到负链、缺失/无效方向或同read多个参考时明确中止，避免静默输出不完整结果。已有经核实的负链prepared表仍可用于predict。
+
+版本关系：GitHub当前发布的模型为v0.3.0；本维护源码包为v0.3.1，权重和预测数学算法沿用原版。更新源码不需要重新训练或重传五个模型包。
 
 <a id="quickstart"></a>
 
@@ -45,7 +56,7 @@ nanoremix predict \
 
 ## 1. 版本数量与名称
 
-NanoRemix 统一推理工具版本为 **v0.3.0**。这里有 **4 套第三代 chemistry/task 模型配置**，并非 4 个不同的软件安装包：
+NanoRemix 统一推理工具版本为 **v0.3.1**；继续使用v0.3.0的原始权重。这里有 **4 套第三代 chemistry/task 模型配置**，并非 4 个不同的软件安装包：
 
 | 编号 | chemistry | task | 三代模型输入 | 三代预训练对象 |
 |---|---|---|---|---:|
@@ -170,7 +181,7 @@ RNA002 软件环境需拆开：Guppy/FAST5、Tombo、特征提取和 NanoRemix �
 5. 对齐核实 NPZ 与 sidecar 行数后由 `merge_step6.py` 汇总 Step6。中心基因组坐标为 `ref_start+4`。Remora 的数值字段映射为 mean、std、median、length；输出还应保留 read、reference、start/end、strand 和候选身份。
 6. 构造中心正确、RNA 方向一致的 17 nt 上下文并保留中央 Step6 的 36 个信号数值。融合时另需相同候选的 81 nt 连续成熟 RNA 上下文；跨内含子应沿剪接路径提取。
 
-**负链限制必须注意：**现有 v0.3.0 `nanoremix prepare --format step6` 按参考坐标升序检查相邻 9-mer 重叠；当前 Remora 已把负链序列和信号槽位按 RNA 方向保存，直接调用旧转换器可能漏掉负链候选。不能把它称为已验证的正负链通用入口。已有 `prepare_model_input.py` 和 splice-aware 上下文脚本依赖已知 catalog/truth 字段，也不能原样用于未知样本。新样本需按 `ref_start+4` 构造上下文、校验中央序列、同步反转序列与数值槽位（需要反向时），并记录每条拒绝原因；当前包没有声称包含经过验证的任意未知样本全转录组适配器。
+**RNA004 Step6转换限制：**旧v0.3.0转换器按参考坐标升序拼接相邻9-mer，对RNA方向负链可能丢候选。v0.3.1的 `nanoremix prepare --format step6` 要求显式 `strand` 列，值为+/-；若包含任意负链行（包括正负链混合），在写出结果前明确报错。同一read若声明多个参考也会报错，避免跨比对拼接。不要改写链标签或删除负链来冒充完整处理；此保护没有实现通用负链适配。已有 `prepare_model_input.py` 和 splice-aware 上下文脚本依赖已知 catalog/truth 字段，也不能原样用于未知样本。新样本需按 `ref_start+4` 构造上下文、校验中央序列、同步反转序列与数值槽位（需要反向时），并记录每条拒绝原因；当前包没有声称包含经过验证的任意未知样本全转录组适配器。
 
 RNA004 的参考序列、regions、BAM 和 FASTA 必须对应同一参考版本。9-mer region 文件格式和区间是候选 9-mer 左端起点，不等同于任意 site BED；细节见 [RNA004 pipeline 模板](docs/guide_20261104/PIPELINE_命令与输入衔接.md)。
 
@@ -380,7 +391,7 @@ nanoremix prepare --help
 
 `validate`运行所给输入/模型推理，但不保存预测表；使用与predict相同的输入、类别、路由和模型参数，通常省略output。
 
-`prepare`必需 `--input`、`--output`、`--chemistry RNA002|RNA004`、`--format step4|extracted|step6`。RNA002支持step4/extracted，RNA004支持step6且受前述负链限制；输出须为新文件。它只转换已有特征，不执行basecall、比对或信号提取。
+`prepare`必需 `--input`、`--output`、`--chemistry RNA002|RNA004`、`--format step4|extracted|step6`。RNA002支持step4/extracted，RNA004支持显式声明为正链的step6，负链或方向缺失会报错；输出须为新文件。它只转换已有特征，不执行basecall、比对或信号提取。
 
 ### 结果文件
 

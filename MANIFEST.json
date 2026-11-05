@@ -7,8 +7,8 @@
   "files": [
     {
       "path": ".github/workflows/tests.yml",
-      "bytes": 1125,
-      "sha256": "2cf22f4dbf2c86eb3b2631851c86852300a5336e8d4b4bdad34c95e9786733d5"
+      "bytes": 1420,
+      "sha256": "516dc8c55ccaa0725bca6596357b3dac37a1e979729f77df2bad84714d2e015b"
     },
     {
       "path": ".gitignore",
@@ -17,8 +17,8 @@
     },
     {
       "path": "DISTRIBUTION.json",
-      "bytes": 1081,
-      "sha256": "5f2bdd321ca62be729327b2b325ae083aac316e47c8edb1f9f7a1ece2a7a7008"
+      "bytes": 1272,
+      "sha256": "bd0466a008b458683a5818e6b9a71f1dedb5ca20a054db0e61d879191956e3fd"
     },
     {
       "path": "LICENSE",
@@ -32,8 +32,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 28388,
-      "sha256": "0c47165980eb15976bf6d072038cd32507395678010bb24d7e275630e3880187"
+      "bytes": 29446,
+      "sha256": "a50e464a622dfe1b6caf22aebf0fe79a8204867f3dc39d0f15559afdad85f291"
     },
     {
       "path": "SECURITY.md",
@@ -42,8 +42,8 @@
     },
     {
       "path": "START_HERE.zh-CN.md",
-      "bytes": 1061,
-      "sha256": "9c9b868bd1a48e6750340d64f747228a6319b421c2ac9b5cab894e138dfb427f"
+      "bytes": 1138,
+      "sha256": "ebc7222e0a8aac5847ed7a539fe4b5bc400e668123e0d56f6cee1b81559d50ff"
     },
     {
       "path": "constraints-models.txt",
@@ -52,13 +52,13 @@
     },
     {
       "path": "docs/INPUTS.md",
-      "bytes": 6447,
-      "sha256": "7c7520f96ab9d4d4c185507747fb2c4eba0eed85f7d0f5724b988313e6b3ec9a"
+      "bytes": 6975,
+      "sha256": "0b4ee3d9d2aa2c431f4e25336a7a818a4b7639619440969b0932362acdbe4b71"
     },
     {
       "path": "docs/KNOWN_LIMITATIONS.zh-CN.md",
-      "bytes": 3071,
-      "sha256": "abdcb0cb5e733de4c5875901c55fe0840cd641f0dbf0a4bd5af1cbd29c62a8ab"
+      "bytes": 3388,
+      "sha256": "d5c2ad1284f1b9d89575d347e2a923dbc6a5b3cd69dfa7b66f8d5c08e5876f34"
     },
     {
       "path": "docs/MODELS.md",
@@ -67,23 +67,23 @@
     },
     {
       "path": "docs/OPTIONS.md",
-      "bytes": 5323,
-      "sha256": "6bd7e947f29db8499611e1f586afe5e8a9c05bbb18ef4d1d1c4a655ee94cd679"
+      "bytes": 5541,
+      "sha256": "64f7735b5f1f376b885f2365a445bcb3776f19a9c60fde0137ec8f3a55d593f7"
     },
     {
       "path": "docs/OVERVIEW.zh-CN.md",
-      "bytes": 21814,
-      "sha256": "2added35618b8d3e831cd395578d02dcdeaea3ad9655b096d72a7ca2b73f7e80"
+      "bytes": 22016,
+      "sha256": "52829320d78235753b82253c1f94ebf641da016f0f289b4b5c348f25e1596282"
     },
     {
       "path": "docs/README.zh-CN.md",
-      "bytes": 7328,
-      "sha256": "db7516d150f6e58a82c565e3c7a01e26b7c4ea79779fb23742528013d86b1988"
+      "bytes": 7554,
+      "sha256": "a1ca1dfba3342fa14734992a804b7e277fc5b302f7daac151c979e58d9656464"
     },
     {
       "path": "docs/UPLOAD.zh-CN.md",
-      "bytes": 3886,
-      "sha256": "6a5e339790300599942f0aff9102efd14dc636101daad404e1f8d8e50874b583"
+      "bytes": 3552,
+      "sha256": "cbc177063e1090b165fc2ac546cde45d52892d7867698c88a894e87fd81e75f9"
     },
     {
       "path": "docs/guide_20261104/CLI_help.txt",
@@ -92,8 +92,8 @@
     },
     {
       "path": "docs/guide_20261104/PIPELINE_命令与输入衔接.md",
-      "bytes": 11381,
-      "sha256": "fc7d1c9ef951c0777b18393b2be854e78ff878c7090dc57e6decfc4fdfa495f1"
+      "bytes": 11767,
+      "sha256": "c0c286cceee118c574457ccd9215fdf48ccd9d609a0626acc5a66b0194a24320"
     },
     {
       "path": "docs/guide_20261104/README.md",
@@ -102,8 +102,8 @@
     },
     {
       "path": "docs/guide_20261104/README_版本输入预处理参数与计算.md",
-      "bytes": 51138,
-      "sha256": "5b95644de9c891acb0d84891f6cf7a8029aecd541631958fc245e2e2c52f1c6e"
+      "bytes": 51524,
+      "sha256": "c5a59b2a07b873c1622b48c5d54414d62e2b2df80e37e15394059005d02b6531"
     },
     {
       "path": "docs/guide_20261104/catalog.json",
@@ -112,8 +112,8 @@
     },
     {
       "path": "docs/guide_20261104/examples/README.md",
-      "bytes": 1218,
-      "sha256": "748db08d20a53bbc52817fd2083b17465c27446d1dcbad11a66db5b6ea0afcf6"
+      "bytes": 1604,
+      "sha256": "08fd98ae3ab70ebfbdf59f2bf5bf9d15094840cd3db192b99913bbf604da3413"
     },
     {
       "path": "docs/guide_20261104/examples/RNA002_both_probabilities.csv",
@@ -198,12 +198,12 @@
     {
       "path": "pyproject.toml",
       "bytes": 697,
-      "sha256": "2a06684a654c9dc586dbd707a88d89b74ea5c11d481c9fe346bb9318337b3090"
+      "sha256": "d0bed19ad3e0a26047490e878d82cb37d8fc21f44df8ca94fdb72237b3db384f"
     },
     {
       "path": "src/nanoremix/__init__.py",
       "bytes": 98,
-      "sha256": "677d1362bcc501c6be64c60dd9823f2c7d359d6c44f4e0fb46a1ec1c055762a7"
+      "sha256": "12cf6a919478cc8bfce14a09debe515a8d8efb611b71e803047e5566146003a3"
     },
     {
       "path": "src/nanoremix/__main__.py",
@@ -302,8 +302,8 @@
     },
     {
       "path": "src/nanoremix/cli.py",
-      "bytes": 10093,
-      "sha256": "1799bf5db493af47b5a96a5bfc632f48afd59e16e371f3d0422f5a525af28e03"
+      "bytes": 11065,
+      "sha256": "77f46e8f0cf02d3febaba9b1b2f23f5d6975428d7006ecb368ca63e8544d64b9"
     },
     {
       "path": "src/nanoremix/engines.py",
@@ -342,8 +342,8 @@
     },
     {
       "path": "tests/test_documented_examples.py",
-      "bytes": 1964,
-      "sha256": "2fc6333bdbc7b6a4b5f933d3fd3b3cccea2f53ec74edcbd7c6e935ebf94d361b"
+      "bytes": 4932,
+      "sha256": "60ae6d57873202e90f2faef262f429ac933a34026efea1cca9defe51c15ad8ca"
     },
     {
       "path": "tests/test_model_adapters.py",
@@ -367,8 +367,8 @@
     },
     {
       "path": "tests/test_release_package.py",
-      "bytes": 2246,
-      "sha256": "497638dc88c23a148a72f3d1f00dd1dfeda8eb0e23de898e7af39a7d0d2d5bf3"
+      "bytes": 3189,
+      "sha256": "4b56cc2900f11e1b2d6145bc24d2e7c4141d2ce71db5fc8ab0281b2f2d321813"
     },
     {
       "path": "tests/test_sequences.py",
@@ -377,8 +377,8 @@
     },
     {
       "path": "tools/build_source_release.py",
-      "bytes": 3544,
-      "sha256": "128739f79750dc35e81ae0f5e55c36b7c6a6097458d8279018f5c10ae04fd77e"
+      "bytes": 5223,
+      "sha256": "a8980adb96e24a71a824fdb5f40bf9b18a95880310c5c897c6f8ca4293351cf7"
     },
     {
       "path": "tools/smoke_installed.py",
@@ -482,8 +482,8 @@
     },
     {
       "path": "verification/README.md",
-      "bytes": 1098,
-      "sha256": "64f6d2dd01124e426dce92112ca107f2ba61579024c4c3783bcea348aefd7905"
+      "bytes": 1863,
+      "sha256": "10cbf42ec985814c95ca33fd48bb1b51fd81c1d5fb7baaf0889632121e9fc236"
     },
     {
       "path": "verification/verify_distribution.py",

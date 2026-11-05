@@ -1,10 +1,10 @@
-# NanoRemix v0.3.0 完整功能与使用说明
+# NanoRemix v0.3.1 完整功能与使用说明
 
 本文件是源码包内的中文总览，集中说明 NanoRemix 的模型配置、运行路线、输入文件、上游数据准备、命令参数、筛选和计算。逐项 CLI help、复杂坐标规则和完整推导仍以本目录链接的专题文档及实际代码为准。
 
 ## 1. 版本数量与名称
 
-NanoRemix 统一推理工具版本为 **v0.3.0**。这里有 **4 套第三代 chemistry/task 模型配置**，并非 4 个不同的软件安装包：
+NanoRemix 统一推理工具版本为 **v0.3.1**；继续使用v0.3.0的原始权重。这里有 **4 套第三代 chemistry/task 模型配置**，并非 4 个不同的软件安装包：
 
 | 编号 | chemistry | task | 三代模型输入 | 三代预训练对象 |
 |---|---|---|---|---:|
@@ -125,7 +125,7 @@ RNA002 软件环境需拆开：Guppy/FAST5、Tombo、特征提取和 NanoRemix �
 5. 对齐核实 NPZ 与 sidecar 行数后由 `merge_step6.py` 汇总 Step6。中心基因组坐标为 `ref_start+4`。Remora 的数值字段映射为 mean、std、median、length；输出还应保留 read、reference、start/end、strand 和候选身份。
 6. 构造中心正确、RNA 方向一致的 17 nt 上下文并保留中央 Step6 的 36 个信号数值。融合时另需相同候选的 81 nt 连续成熟 RNA 上下文；跨内含子应沿剪接路径提取。
 
-**负链限制必须注意：**现有 v0.3.0 `nanoremix prepare --format step6` 按参考坐标升序检查相邻 9-mer 重叠；当前 Remora 已把负链序列和信号槽位按 RNA 方向保存，直接调用旧转换器可能漏掉负链候选。不能把它称为已验证的正负链通用入口。已有 `prepare_model_input.py` 和 splice-aware 上下文脚本依赖已知 catalog/truth 字段，也不能原样用于未知样本。新样本需按 `ref_start+4` 构造上下文、校验中央序列、同步反转序列与数值槽位（需要反向时），并记录每条拒绝原因；当前包没有声称包含经过验证的任意未知样本全转录组适配器。
+**RNA004 Step6转换限制：**旧v0.3.0转换器按参考坐标升序拼接相邻9-mer，对RNA方向负链可能丢候选。v0.3.1的 `nanoremix prepare --format step6` 要求显式 `strand` 列，值为+/-；若包含任意负链行（包括正负链混合），在写出结果前明确报错。同一read若声明多个参考也会报错，避免跨比对拼接。不要改写链标签或删除负链来冒充完整处理；此保护没有实现通用负链适配。已有 `prepare_model_input.py` 和 splice-aware 上下文脚本依赖已知 catalog/truth 字段，也不能原样用于未知样本。新样本需按 `ref_start+4` 构造上下文、校验中央序列、同步反转序列与数值槽位（需要反向时），并记录每条拒绝原因；当前包没有声称包含经过验证的任意未知样本全转录组适配器。
 
 RNA004 的参考序列、regions、BAM 和 FASTA 必须对应同一参考版本。9-mer region 文件格式和区间是候选 9-mer 左端起点，不等同于任意 site BED；细节见 [RNA004 pipeline 模板](guide_20261104/PIPELINE_命令与输入衔接.md)。
 

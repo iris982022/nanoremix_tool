@@ -1,26 +1,29 @@
-"""Build a minimal source-only upload package, excluding author working documents."""
+"""Build the documented source distribution with refreshed integrity metadata."""
 
 import argparse
 import hashlib
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import shutil
 import zipfile
 
 
-ROOT_FILES = (
-    "README.md", "pyproject.toml", "constraints-models.txt", ".gitignore", "LICENSE", "NOTICE.md", "SECURITY.md",
-    ".github/workflows/tests.yml",
-    "docs/README.zh-CN.md", "docs/INPUTS.md", "docs/MODELS.md", "docs/OPTIONS.md",
-    "examples/make_demo.py", "examples/make_feature_demo.py", "examples/minimal_binary_probabilities.csv",
-    "tools/build_source_release.py", "tools/smoke_installed.py", "tools/smoke_models.py",
-)
-
-
 def source_files(root):
-    files = [root / name for name in ROOT_FILES]
-    files.extend(sorted((root / "src/nanoremix").rglob("*.py")))
-    files.extend(sorted((root / "tests").glob("*.py")))
+    # The published manifest defines the source selection, including every manual
+    # linked by README. Never glob a working tree containing data or credentials.
+    manifest = json.loads((root / "MANIFEST.json").read_text(encoding="utf-8"))
+    names = [row["path"] for row in manifest["files"]]
+    if len(names) != len(set(names)):
+        raise ValueError("Duplicate source manifest paths")
+    for name in names:
+        relative = PurePosixPath(name)
+        if (not name or not relative.parts or relative.is_absolute() or ".." in relative.parts
+                or str(relative) != name or "\\" in name
+                or name in {"MANIFEST.json", "SHA256SUMS.txt"}
+                or relative.parts[0] in {".git", "models", "data", "raw_data"}
+                or relative.suffix in {".pkl", ".pickle", ".pt", ".pth", ".pyc"}):
+            raise ValueError(f"Invalid source manifest path: {name}")
+    files = [root / name for name in names]
     if not (root / "src/nanoremix/cli.py").is_file() or not (root / "tests/test_pipeline.py").is_file():
         raise ValueError("Source tree lacks the inference package or regression tests")
     for path in files:
@@ -38,24 +41,43 @@ def build(root, output):
     output.mkdir(parents=True)
     project = output / "NanoRemix"
     archive = output / "NanoRemix_GitHub_source.zip"
-    manifest = []
+    for source in files:
+        target = project / source.relative_to(root)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, target)
+    distribution_file = project / "DISTRIBUTION.json"
+    distribution = json.loads(distribution_file.read_text(encoding="utf-8"))
+    distribution.update(project_file_count=len(files) + 2,
+                        source_zip_contains_project_files=len(files) + 2,
+                        source_archive=archive.name)
+    distribution_file.write_text(json.dumps(distribution, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    selected = sorted(project / path.relative_to(root) for path in files)
+    manifest = [{"path": path.relative_to(project).as_posix(), "bytes": path.stat().st_size,
+                 "sha256": hashlib.sha256(path.read_bytes()).hexdigest()} for path in selected]
+    (project / "MANIFEST.json").write_text(json.dumps({
+        "profile": "source", "excluded_self_referential_files": ["MANIFEST.json", "SHA256SUMS.txt"],
+        "files": manifest,
+    }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    selected = sorted([*selected, project / "MANIFEST.json"])
+    (project / "SHA256SUMS.txt").write_text("".join(
+        f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.relative_to(project).as_posix()}\n"
+        for path in selected), encoding="utf-8")
+    selected = sorted([*selected, project / "SHA256SUMS.txt"])
+    archive_manifest = []
     with zipfile.ZipFile(archive, "x", compression=zipfile.ZIP_DEFLATED) as bundle:
-        for source in files:
-            relative = source.relative_to(root)
-            target = project / relative
-            target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(source, target)
-            data = target.read_bytes()
+        for source in selected:
+            relative = source.relative_to(project)
+            data = source.read_bytes()
             info = zipfile.ZipInfo((Path("NanoRemix") / relative).as_posix())
             info.compress_type = zipfile.ZIP_DEFLATED
             info.external_attr = 0o100644 << 16
             bundle.writestr(info, data)
-            manifest.append({"path": relative.as_posix(), "bytes": len(data),
+            archive_manifest.append({"path": relative.as_posix(), "bytes": len(data),
                              "sha256": hashlib.sha256(data).hexdigest()})
     report = {
         "package_kind": "source_only", "pretrained_weights_included": False,
-        "real_model_inference_verified": False, "files": manifest,
-        "file_count": len(manifest), "archive": archive.name,
+        "real_model_inference_verified": False, "files": archive_manifest,
+        "file_count": len(archive_manifest), "archive": archive.name,
         "archive_sha256": hashlib.sha256(archive.read_bytes()).hexdigest(),
         "excluded": ["author manuscript audits", "historical validation reports",
                      "release drafts", "paper/figures", "raw data", "model weights",
