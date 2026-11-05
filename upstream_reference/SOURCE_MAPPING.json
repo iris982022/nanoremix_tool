@@ -1,0 +1,117 @@
+{
+  "date": "2026-11-04",
+  "files": [
+    {
+      "original_path": "/gpfs/work/bio/zhixingwu16/Nanopore/NanoRemix/12_HEK_HMEC_m6A_pipeline/config.sh",
+      "bundled_path": "upstream_reference/RNA002/config.sh",
+      "bytes": 4126,
+      "sha256": "42cd0a3d78d17b40d01cddba4e9d185f74886f0b950283dc3bc5803dcde8f649",
+      "modified": false
+    },
+    {
+      "original_path": "/gpfs/work/bio/zhixingwu16/Nanopore/NanoRemix/12_HEK_HMEC_m6A_pipeline/python/extract_tombo_step4.py",
+      "bundled_path": "upstream_reference/RNA002/python/extract_tombo_step4.py",
+      "bytes": 13940,
+      "sha256": "99517dc67e4a7a19da63ac1532483415295b51c0017404ae9ec7b897f0858206",
+      "modified": false
+    },
+    {
+      "original_path": "/gpfs/work/bio/zhixingwu16/Nanopore/NanoRemix/12_HEK_HMEC_m6A_pipeline/slurm/01_basecall_rna002.sbatch",
+      "bundled_path": "upstream_reference/RNA002/slurm/01_basecall_rna002.sbatch",
+      "bytes": 1350,
+      "sha256": "5dd6776307343a419c704d68be609cebc752700cd74270f79d4824d5cca18562",
+      "modified": false
+    },
+    {
+      "original_path": "/gpfs/work/bio/zhixingwu16/Nanopore/NanoRemix/12_HEK_HMEC_m6A_pipeline/slurm/02_make_single_fast5.sbatch",
+      "bundled_path": "upstream_reference/RNA002/slurm/02_make_single_fast5.sbatch",
+      "bytes": 1276,
+      "sha256": "22239eb6cfd9b21018f7ee02f1360ebfed39a0780687f4c695b37e70e5d41cf9",
+      "modified": false
+    },
+    {
+      "original_path": "/gpfs/work/bio/zhixingwu16/Nanopore/NanoRemix/12_HEK_HMEC_m6A_pipeline/slurm/03_tombo_resquiggle.sbatch",
+      "bundled_path": "upstream_reference/RNA002/slurm/03_tombo_resquiggle.sbatch",
+      "bytes": 2029,
+      "sha256": "5ac1ee2fd43c5c8883d44483a56a9de25acb7e9ab2b9295f32e362c7ae4e86d3",
+      "modified": false
+    },
+    {
+      "original_path": "/gpfs/work/bio/zhixingwu16/Nanopore/NanoRemix/12_HEK_HMEC_m6A_pipeline/slurm/04_extract_step4.sbatch",
+      "bundled_path": "upstream_reference/RNA002/slurm/04_extract_step4.sbatch",
+      "bytes": 1385,
+      "sha256": "96f4481c5846862858e5ee34fbb61419ef765d6b585e6d48de610bb086d0734c",
+      "modified": false
+    },
+    {
+      "original_path": "/gpfs/work/bio/zhixingwu16/NanoRemix_fused_tool/validation_RNA004/preprocess_human_pipeline/config.sh",
+      "bundled_path": "upstream_reference/RNA004/preprocess_human_pipeline/config.sh",
+      "bytes": 2029,
+      "sha256": "f427bea9987e65b4a41daeaca5815f7290d7285573c950594ecadaf1178766de",
+      "modified": false
+    },
+    {
+      "original_path": "/gpfs/work/bio/zhixingwu16/NanoRemix_fused_tool/validation_RNA004/preprocess_human_pipeline/01_basecall.sbatch",
+      "bundled_path": "upstream_reference/RNA004/preprocess_human_pipeline/01_basecall.sbatch",
+      "bytes": 2025,
+      "sha256": "42a86af87ff25b08875f77cc305b9eef7f245339f328ad4a8b2cf096bc7a2cbe",
+      "modified": false
+    },
+    {
+      "original_path": "/gpfs/work/bio/zhixingwu16/NanoRemix_fused_tool/validation_RNA004/preprocess_human_pipeline/02_align.sbatch",
+      "bundled_path": "upstream_reference/RNA004/preprocess_human_pipeline/02_align.sbatch",
+      "bytes": 1466,
+      "sha256": "7090f0694ac2bb0ab56f84ea17dc6f4316eaf2e089e637e90acef38483917cb7",
+      "modified": false
+    },
+    {
+      "original_path": "/gpfs/work/bio/zhixingwu16/NanoRemix_fused_tool/validation_RNA004/preprocess_human_pipeline/03_features.sbatch",
+      "bundled_path": "upstream_reference/RNA004/preprocess_human_pipeline/03_features.sbatch",
+      "bytes": 1692,
+      "sha256": "2d186fec85d7076a0c53f090eccf1bbfe94ed1a968b62d64059c4ee3ecabbc00",
+      "modified": false
+    },
+    {
+      "original_path": "/gpfs/work/bio/zhixingwu16/NanoRemix_fused_tool/validation_RNA004/preprocess_human_pipeline/merge_step6.py",
+      "bundled_path": "upstream_reference/RNA004/preprocess_human_pipeline/merge_step6.py",
+      "bytes": 3014,
+      "sha256": "42ade5a2d201c843563617d21d4d72a8682ca8a3713f349719cd5201f9713742",
+      "modified": false
+    },
+    {
+      "original_path": "/gpfs/work/bio/zhixingwu16/NanoRemix_fused_tool/validation_RNA004/preprocess_human_pipeline/prepare_model_input.py",
+      "bundled_path": "upstream_reference/RNA004/preprocess_human_pipeline/prepare_model_input.py",
+      "bytes": 9533,
+      "sha256": "b8cf5b7ebf53b27bd889a0a8342947862f8813a69f1383fdad34315493cc08e7",
+      "modified": false
+    },
+    {
+      "original_path": "/gpfs/work/bio/zhixingwu16/NanoRemix_fused_tool/validation_RNA004/preprocess_pipeline/feature_extraction_rna004.py",
+      "bundled_path": "upstream_reference/RNA004/preprocess_pipeline/feature_extraction_rna004.py",
+      "bytes": 13966,
+      "sha256": "f84f2910e8d7130b781e3917bd3269176319c03f9a5c1e6e62fff78c709316b3",
+      "modified": false
+    },
+    {
+      "original_path": "/gpfs/work/bio/zhixingwu16/NanoRemix_fused_tool/validation_RNA004/mouse_model_pipeline/add_splice_aware_context.py",
+      "bundled_path": "upstream_reference/RNA004/mouse_model_pipeline/add_splice_aware_context.py",
+      "bytes": 9190,
+      "sha256": "f8ac0dedcad4e4a8f8d12998417f119c77643d42e9606f87f90a8a14fa6a56ac",
+      "modified": false
+    },
+    {
+      "original_path": "/gpfs/work/bio/zhixingwu16/Nanopore/NanoRemix/12_HEK_HMEC_m6A_pipeline/python/validate_tombo_fast5.py",
+      "bundled_path": "upstream_reference/RNA002/python/validate_tombo_fast5.py",
+      "bytes": 3127,
+      "sha256": "cf9e4b92135f39a5081a9affc926fc0cad172c03db37add472a1e2ac4fde63a0",
+      "modified": false
+    },
+    {
+      "original_path": "/gpfs/work/bio/yuxinzhang17/DirectMultiRM/ONT/9mer_levels_v1.txt",
+      "bundled_path": "upstream_reference/RNA004/assets/9mer_levels_v1.txt",
+      "bytes": 7764490,
+      "sha256": "1d366c9e060f31be1d6489b88b415666fba42f1c4006e1e549666f4a50f13e63",
+      "modified": false
+    }
+  ]
+}

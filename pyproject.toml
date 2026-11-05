@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nanoremix"
+version = "0.3.0"
+description = "Chemistry-aware RNA modification inference with explicit model provenance"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24,<3", "pandas>=2,<3"]
+
+[project.optional-dependencies]
+models = ["scipy>=1.10,<2", "scikit-learn==1.3.0", "xgboost==2.1.4", "joblib>=1.3,<2", "numpy<2"]
+second = ["torch>=2.2,<3"]
+dev = ["pytest>=7,<9", "build>=1,<2"]
+
+[project.scripts]
+nanoremix = "nanoremix.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

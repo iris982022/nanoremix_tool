@@ -1,0 +1,17 @@
+{
+  "profile": "source",
+  "nanoremix_version": "0.3.0",
+  "packaging_date": "20261105",
+  "source_repository": "https://github.com/iris982022/nanoremix_tool",
+  "source_repository_state_at_packaging": "Source layout and README update prepared locally; not uploaded by this packaging operation.",
+  "project_file_count": 99,
+  "source_zip_contains_project_files": 99,
+  "pretrained_weights_included": false,
+  "model_assets_distributed_as_five_separate_release_zip_files": true,
+  "historical_paper_analysis_archive_included": false,
+  "public_license_status": "pending rights-holder confirmation",
+  "web_upload_stores_archive_without_extracting": true,
+  "compact_package_note": "99 project files with original src/docs directory hierarchy; root README contains complete usage and all 41 predict/validate long options. Weights remain separate Release ZIPs.",
+  "source_archive": "NanoRemix_v0.3.0_GitHub_READY_20261105.zip",
+  "documentation_update": "Expanded root README for GitHub home page; inference code and model bytes unchanged from the final 20261104 source package."
+}

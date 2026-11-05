@@ -1,0 +1,134 @@
+{
+  "RNA002": {
+    "context_nt": 9,
+    "signal_descriptors": 20,
+    "binary_modifications": [
+      "m6A",
+      "m5C",
+      "pseudoU"
+    ],
+    "multi_thirdgen_labels": [
+      "A",
+      "C",
+      "G",
+      "U",
+      "m6A",
+      "m1A",
+      "Inosine",
+      "Am",
+      "m5C",
+      "hm5C",
+      "ac4C",
+      "FormylC",
+      "pseudoU",
+      "m1psi",
+      "m5U",
+      "Um",
+      "m7G",
+      "o8G"
+    ],
+    "multi_fused_common_labels": [
+      "A",
+      "m6A",
+      "m1A",
+      "Inosine",
+      "Am",
+      "C",
+      "m5C",
+      "ac4C",
+      "G",
+      "m7G",
+      "U",
+      "pseudoU",
+      "m5U",
+      "Um"
+    ],
+    "multi_fused_third_only_labels": [
+      "hm5C",
+      "FormylC",
+      "m1psi",
+      "o8G"
+    ],
+    "secondgen_labels": [
+      "A",
+      "C",
+      "G",
+      "U",
+      "Am",
+      "m1A",
+      "m6A",
+      "Inosine",
+      "ac4C",
+      "m5C",
+      "Gm",
+      "m7G",
+      "m5U",
+      "pseudoU",
+      "Um"
+    ]
+  },
+  "RNA004": {
+    "context_nt": 17,
+    "signal_descriptors": 36,
+    "binary_modifications": [
+      "m6A",
+      "m5C",
+      "pseudoU"
+    ],
+    "multi_thirdgen_labels": [
+      "A",
+      "C",
+      "G",
+      "U",
+      "m6A",
+      "m1A",
+      "Am",
+      "m5C",
+      "hm5C",
+      "ac4C",
+      "o8G",
+      "Gm",
+      "m5U",
+      "pseudoU",
+      "Um",
+      "m1psi"
+    ],
+    "multi_fused_common_labels": [
+      "A",
+      "m6A",
+      "m1A",
+      "Am",
+      "C",
+      "m5C",
+      "ac4C",
+      "G",
+      "Gm",
+      "U",
+      "pseudoU",
+      "m5U",
+      "Um"
+    ],
+    "multi_fused_third_only_labels": [
+      "hm5C",
+      "o8G",
+      "m1psi"
+    ],
+    "secondgen_labels": [
+      "A",
+      "C",
+      "G",
+      "U",
+      "Am",
+      "m1A",
+      "m6A",
+      "Inosine",
+      "ac4C",
+      "m5C",
+      "Gm",
+      "m7G",
+      "m5U",
+      "pseudoU",
+      "Um"
+    ]
+  }
+}

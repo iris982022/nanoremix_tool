@@ -1,0 +1,293 @@
+usage: nanoremix [-h] [--version]
+                 {predict,validate,catalog,doctor,prepare} ...
+
+RNA002/RNA004 Binary/Multi inference with explicit class selection and
+generation provenance.
+
+positional arguments:
+  {predict,validate,catalog,doctor,prepare}
+    predict             Run inference
+    validate            Run complete input/model validation without saving
+                        predictions
+    catalog             List supported modifications by chemistry, task and
+                        generation
+    doctor              Check required model files, manifests and hashes
+                        without executing models
+    prepare             Convert legacy extracted features into a prepared
+                        context table
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+
+
+COMMAND predict
+usage: nanoremix predict [-h] --input INPUT [--output OUTPUT] --task
+                         {binary,multi} [--chemistry {auto,RNA002,RNA004}]
+                         (--mods MODS | --targets TARGETS)
+                         [--canonical {matching,all}]
+                         (--data-type {biological,synthetic} | --mode {thirdgen,fused,both,secondgen})
+                         [--also-thirdgen] [--also-secondgen]
+                         [--strategy {s1,s2,both}]
+                         [--input-kind {features,probabilities}]
+                         [--condition {full,mean,std,length}]
+                         [--model-root MODEL_ROOT] [--trust-model-files]
+                         [--model-checksums MODEL_CHECKSUMS]
+                         [--second-model-root SECOND_MODEL_ROOT]
+                         [--second-probabilities SECOND_PROBABILITIES]
+                         [--join-on JOIN_ON]
+                         [--sequence-column SEQUENCE_COLUMN]
+                         [--context-fasta CONTEXT_FASTA]
+                         [--fasta-id-column FASTA_ID_COLUMN]
+                         [--center-column CENTER_COLUMN]
+                         [--coordinate-base {0,1}]
+                         [--strand-column STRAND_COLUMN]
+                         [--fusion-scope {common,extended}]
+                         [--second-weight SECOND_WEIGHT]
+                         [--third-weight THIRD_WEIGHT]
+                         [--binary-bias BINARY_BIAS]
+                         [--min-confidence MIN_CONFIDENCE]
+                         [--min-selected-mass MIN_SELECTED_MASS]
+                         [--min-second-mass MIN_SECOND_MASS]
+                         [--output-filter {all,retained,modified}]
+                         [--on-invalid {error,mark}]
+                         [--truth-column TRUTH_COLUMN]
+                         [--chunk-size CHUNK_SIZE] [--batch-size BATCH_SIZE]
+                         [--device {cpu,cuda,mps}] [--keep-features]
+
+options:
+  -h, --help            show this help message and exit
+  --input INPUT         CSV/TSV, optionally gzip-compressed
+  --output OUTPUT       New output directory (required for predict)
+  --task {binary,multi}
+  --chemistry {auto,RNA002,RNA004}
+  --mods MODS           Comma-separated modifications, or all; matching
+                        canonical controls are added
+  --targets TARGETS     Multi-only exact competing class list, including
+                        canonical controls when desired
+  --canonical {matching,all}
+  --data-type {biological,synthetic}
+                        Biological data defaults to fused output; synthetic
+                        data uses third-generation-only output
+  --mode {thirdgen,fused,both,secondgen}
+                        Advanced compatibility override; use --data-type for
+                        the normal workflow
+  --also-thirdgen       Biological data: also save pure third-generation
+                        predictions
+  --also-secondgen      Biological data: also save pure second-generation
+                        predictions for supported selected labels
+  --strategy {s1,s2,both}
+                        Paper strategy; historical s3 is accepted as an alias
+                        for s2. both writes separate predictions.
+  --input-kind {features,probabilities}
+  --condition {full,mean,std,length}
+  --model-root MODEL_ROOT
+                        Directory with RNA002/, RNA004/, and optional
+                        secondgen/
+  --trust-model-files   Explicit consent to load verified local
+                        pickle/checkpoint/Python model files
+  --model-checksums MODEL_CHECKSUMS
+                        JSON mapping model-root-relative file names to
+                        verified SHA256 values
+  --second-model-root SECOND_MODEL_ROOT
+                        Override secondgen directory containing
+                        scripts/train.py and models/
+  --second-probabilities SECOND_PROBABILITIES
+                        Original 15-class CSV/TSV matched by explicit identity
+                        columns
+  --join-on JOIN_ON     Comma-separated identity keys; never a positional row-
+                        order join
+  --sequence-column SEQUENCE_COLUMN
+                        81-nt sequence column, or optional validation column
+                        in the second probability table
+  --context-fasta CONTEXT_FASTA
+                        Reference or same-run event-sequence FASTA, never
+                        inferred from short k-mers
+  --fasta-id-column FASTA_ID_COLUMN
+                        Input column matching the first FASTA header token
+  --center-column CENTER_COLUMN
+                        Target nucleotide coordinate within that FASTA
+                        sequence
+  --coordinate-base {0,1}
+  --strand-column STRAND_COLUMN
+                        +/- orientation; absent means already transcript-
+                        oriented
+  --fusion-scope {common,extended}
+  --second-weight SECOND_WEIGHT
+  --third-weight THIRD_WEIGHT
+  --binary-bias BINARY_BIAS
+                        Frozen Binary fusion log-odds bias; never fitted on
+                        prediction labels
+  --min-confidence MIN_CONFIDENCE
+  --min-selected-mass MIN_SELECTED_MASS
+  --min-second-mass MIN_SECOND_MASS
+  --output-filter {all,retained,modified}
+  --on-invalid {error,mark}
+  --truth-column TRUTH_COLUMN
+                        Optional evaluation labels; never used for predictions
+                        or parameter fitting
+  --chunk-size CHUNK_SIZE
+  --batch-size BATCH_SIZE
+  --device {cpu,cuda,mps}
+  --keep-features       Keep input feature columns, excluding all input
+                        probability columns
+
+
+COMMAND validate
+usage: nanoremix validate [-h] --input INPUT [--output OUTPUT] --task
+                          {binary,multi} [--chemistry {auto,RNA002,RNA004}]
+                          (--mods MODS | --targets TARGETS)
+                          [--canonical {matching,all}]
+                          (--data-type {biological,synthetic} | --mode {thirdgen,fused,both,secondgen})
+                          [--also-thirdgen] [--also-secondgen]
+                          [--strategy {s1,s2,both}]
+                          [--input-kind {features,probabilities}]
+                          [--condition {full,mean,std,length}]
+                          [--model-root MODEL_ROOT] [--trust-model-files]
+                          [--model-checksums MODEL_CHECKSUMS]
+                          [--second-model-root SECOND_MODEL_ROOT]
+                          [--second-probabilities SECOND_PROBABILITIES]
+                          [--join-on JOIN_ON]
+                          [--sequence-column SEQUENCE_COLUMN]
+                          [--context-fasta CONTEXT_FASTA]
+                          [--fasta-id-column FASTA_ID_COLUMN]
+                          [--center-column CENTER_COLUMN]
+                          [--coordinate-base {0,1}]
+                          [--strand-column STRAND_COLUMN]
+                          [--fusion-scope {common,extended}]
+                          [--second-weight SECOND_WEIGHT]
+                          [--third-weight THIRD_WEIGHT]
+                          [--binary-bias BINARY_BIAS]
+                          [--min-confidence MIN_CONFIDENCE]
+                          [--min-selected-mass MIN_SELECTED_MASS]
+                          [--min-second-mass MIN_SECOND_MASS]
+                          [--output-filter {all,retained,modified}]
+                          [--on-invalid {error,mark}]
+                          [--truth-column TRUTH_COLUMN]
+                          [--chunk-size CHUNK_SIZE] [--batch-size BATCH_SIZE]
+                          [--device {cpu,cuda,mps}] [--keep-features]
+
+options:
+  -h, --help            show this help message and exit
+  --input INPUT         CSV/TSV, optionally gzip-compressed
+  --output OUTPUT       New output directory (required for predict)
+  --task {binary,multi}
+  --chemistry {auto,RNA002,RNA004}
+  --mods MODS           Comma-separated modifications, or all; matching
+                        canonical controls are added
+  --targets TARGETS     Multi-only exact competing class list, including
+                        canonical controls when desired
+  --canonical {matching,all}
+  --data-type {biological,synthetic}
+                        Biological data defaults to fused output; synthetic
+                        data uses third-generation-only output
+  --mode {thirdgen,fused,both,secondgen}
+                        Advanced compatibility override; use --data-type for
+                        the normal workflow
+  --also-thirdgen       Biological data: also save pure third-generation
+                        predictions
+  --also-secondgen      Biological data: also save pure second-generation
+                        predictions for supported selected labels
+  --strategy {s1,s2,both}
+                        Paper strategy; historical s3 is accepted as an alias
+                        for s2. both writes separate predictions.
+  --input-kind {features,probabilities}
+  --condition {full,mean,std,length}
+  --model-root MODEL_ROOT
+                        Directory with RNA002/, RNA004/, and optional
+                        secondgen/
+  --trust-model-files   Explicit consent to load verified local
+                        pickle/checkpoint/Python model files
+  --model-checksums MODEL_CHECKSUMS
+                        JSON mapping model-root-relative file names to
+                        verified SHA256 values
+  --second-model-root SECOND_MODEL_ROOT
+                        Override secondgen directory containing
+                        scripts/train.py and models/
+  --second-probabilities SECOND_PROBABILITIES
+                        Original 15-class CSV/TSV matched by explicit identity
+                        columns
+  --join-on JOIN_ON     Comma-separated identity keys; never a positional row-
+                        order join
+  --sequence-column SEQUENCE_COLUMN
+                        81-nt sequence column, or optional validation column
+                        in the second probability table
+  --context-fasta CONTEXT_FASTA
+                        Reference or same-run event-sequence FASTA, never
+                        inferred from short k-mers
+  --fasta-id-column FASTA_ID_COLUMN
+                        Input column matching the first FASTA header token
+  --center-column CENTER_COLUMN
+                        Target nucleotide coordinate within that FASTA
+                        sequence
+  --coordinate-base {0,1}
+  --strand-column STRAND_COLUMN
+                        +/- orientation; absent means already transcript-
+                        oriented
+  --fusion-scope {common,extended}
+  --second-weight SECOND_WEIGHT
+  --third-weight THIRD_WEIGHT
+  --binary-bias BINARY_BIAS
+                        Frozen Binary fusion log-odds bias; never fitted on
+                        prediction labels
+  --min-confidence MIN_CONFIDENCE
+  --min-selected-mass MIN_SELECTED_MASS
+  --min-second-mass MIN_SECOND_MASS
+  --output-filter {all,retained,modified}
+  --on-invalid {error,mark}
+  --truth-column TRUTH_COLUMN
+                        Optional evaluation labels; never used for predictions
+                        or parameter fitting
+  --chunk-size CHUNK_SIZE
+  --batch-size BATCH_SIZE
+  --device {cpu,cuda,mps}
+  --keep-features       Keep input feature columns, excluding all input
+                        probability columns
+
+
+COMMAND catalog
+usage: nanoremix catalog [-h] [--chemistry {RNA002,RNA004}]
+
+options:
+  -h, --help            show this help message and exit
+  --chemistry {RNA002,RNA004}
+
+
+COMMAND doctor
+usage: nanoremix doctor [-h] [--model-root MODEL_ROOT]
+                        [--chemistry {RNA002,RNA004}] [--task {binary,multi}]
+                        [--mods MODS] [--strategy {s1,s2,both}]
+                        [--data-type {biological,synthetic}]
+                        [--second-source {sequence,probabilities}]
+                        [--condition {full,mean,std,length}]
+                        [--model-checksums MODEL_CHECKSUMS] [--strict]
+
+options:
+  -h, --help            show this help message and exit
+  --model-root MODEL_ROOT
+  --chemistry {RNA002,RNA004}
+                        Omit to check both chemistries
+  --task {binary,multi}
+                        Omit to check both tasks
+  --mods MODS
+  --strategy {s1,s2,both}
+  --data-type {biological,synthetic}
+  --second-source {sequence,probabilities}
+                        probabilities: the user will supply precomputed
+                        second-generation scores
+  --condition {full,mean,std,length}
+  --model-checksums MODEL_CHECKSUMS
+  --strict              Exit with status 2 if files or dependencies are
+                        missing/invalid
+
+
+COMMAND prepare
+usage: nanoremix prepare [-h] --input INPUT --output OUTPUT --chemistry
+                         {RNA002,RNA004} --format {step4,extracted,step6}
+
+options:
+  -h, --help            show this help message and exit
+  --input INPUT
+  --output OUTPUT
+  --chemistry {RNA002,RNA004}
+  --format {step4,extracted,step6}
