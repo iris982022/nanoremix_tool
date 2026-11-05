@@ -1,56 +1,185 @@
 # NanoRemix
 
-**RNA002 / RNA004 RNA修饰预测：Binary、Multi、纯三代及二代＋三代融合。**
+**用于RNA002 / RNA004的RNA修饰预测：Binary、Multi、纯三代、二代＋三代融合。**
 
-工具版本 **v0.3.1** · Python **3.10/3.11** · 主页说明更新 **2026-11-05**
+工具版本 **v0.3.1** · 建议Python **3.10/3.11** · 继续使用已发布的 **v0.3.0模型权重**
 
-[快速运行](#quickstart) · [四套配置](#configurations) · [输入](#inputs) · [上游流程](#preprocessing) · [全部参数](#options) · [计算](#calculation) · [权重](#models) · [运行与输出](#examples)
+**已有正确prepared特征表，并安装匹配模型后，可以直接预测。** 源码和五个模型包均已公开。只有原始FAST5/POD5时，还需先完成对应化学版本的basecalling、比对和信号提取。RNA004的旧Step6入口目前仅接受显式正链输入；正确准备的正/负链特征表均可交给predict。见[预处理与限制](#preprocessing)。
 
-源码与权重分别分发。源码不含模型，运行特征推理前需从 [Releases](https://github.com/iris982022/nanoremix_tool/releases) 下载对应附件。首次可先跑无需权重的人工概率示例。本次维护版恢复缺失文件，修复源码打包和参数说明，并为旧RNA004 Step6转换加输入保护。预测算法与权重不变；模型继续下载v0.3.0 Release的五个ZIP。
+[先选配置](#choose) · [支持哪些修饰](#modifications) · [需要哪些输入](#start-inputs) · [安装与下载模型](#start-install) · [运行命令](#start-run) · [无需权重示例](#quickstart) · [完整参数](#options) · [详细流程](#preprocessing)
 
+<a id="choose"></a>
 
+## 开始使用：先确定三个选择
 
-### 本次维护版修复
+| 选择 | 应该怎样确定 | 命令参数 |
+|---|---|---|
+| RNA002还是RNA004 | 按样本实际使用的ONT RNA测序试剂/化学版本选择；查看实验记录、kit和basecalling配置。两者的特征及权重不能互换 | `--chemistry RNA002` 或 `--chemistry RNA004` |
+| Binary还是Multi | Binary比较特定修饰与对应正常碱基，仅支持m6A、m5C、pseudoU；Multi在同一参考碱基家族内比较所选多类修饰和正常对照 | `--task binary` 或 `--task multi` |
+| 纯三代还是二代＋三代 | 只用对应序列＋信号特征时选纯三代；还要结合连续81 nt序列模型证据时选融合，并额外提供二代来源 | 纯三代 `--mode thirdgen`；融合 `--data-type biological` |
 
-- 恢复 `.gitignore` 与自动测试workflow，并在CI检查分发完整性。
-- 统一必填参数、融合权重必须严格大于0及实际参数名 `--condition`。
-- 源码构建保留README引用的详细手册、上游脚本和示例；生成当前文件的完整性清单，精简源码仍为99个文件。
-- RNA004旧Step6转换遇到负链、缺失/无效方向或同read多个参考时明确中止，避免静默输出不完整结果。已有经核实的负链prepared表仍可用于predict。
+这里的“二代/三代”是**NanoRemix模型分支**：二代使用连续81 nt序列，三代使用对应化学版本的序列和电流特征，**不要求额外做Illumina测序**。生物样本也可以明确选择纯三代，无需把它标为synthetic。
 
-版本关系：GitHub当前发布的模型为v0.3.0；本维护源码包为v0.3.1，权重和预测数学算法沿用原版。更新源码不需要重新训练或重传五个模型包。
+| 四套核心配置 | 纯三代需要什么 | 融合还需要什么 |
+|---|---|---|
+| RNA002 Binary | RNA002 prepared＋RNA002 Binary模型 | 同中心81 nt＋SecondGen模型，或完整二代概率 |
+| RNA002 Multi | RNA002 prepared＋RNA002 Multi模型 | 同上 |
+| RNA004 Binary | RNA004 prepared＋RNA004 Binary模型 | 同上 |
+| RNA004 Multi | RNA004 prepared＋RNA004 Multi模型 | 同上 |
 
-<a id="quickstart"></a>
+共4套核心配置，每套支持纯三代和融合，共8条主要路线。每条都可选S1/S2，默认 `--strategy s2`。`--strategy both` 分别输出S1和S2；S1/S2与二代/三代是不同选择，both不会计算共识。
 
-## 快速运行：无需权重的示例
+<a id="modifications"></a>
 
-获取保留目录结构的源码，进入含 `pyproject.toml` 和 `src/` 的根目录：
+## 支持哪些修饰
+
+下表列修饰标签；模型另含正常碱基A/C/G/U。**Binary两种chemistry均只有3种修饰；RNA002 Multi有14种修饰＋4正常类，RNA004 Multi有12种修饰＋4正常类。**
+
+| 参考家族 | RNA002 Binary | RNA004 Binary | RNA002 Multi | RNA004 Multi |
+|---|---|---|---|---|
+| A | m6A，对照A | m6A，对照A | m6A、m1A、Inosine、Am | m6A、m1A、Am |
+| C | m5C，对照C | m5C，对照C | m5C、hm5C、ac4C、FormylC | m5C、hm5C、ac4C |
+| G | 无G家族修饰分类器 | 无G家族修饰分类器 | m7G、o8G | o8G、Gm |
+| U | pseudoU，对照U | pseudoU，对照U | pseudoU、m1psi、m5U、Um | pseudoU、m1psi、m5U、Um |
+
+通过 `--mods m6A`、`--mods m6A,m5C,pseudoU` 或 `--mods all` 指定修饰；逗号列表不加空格。默认自动加入对应正常对照，例如 `--mods m6A,m1A` 在Multi中比较A/m6A/m1A。正常碱基不要写进mods；Multi要精确指定竞争类时可改用 `--targets A,m6A,m1A`。mods与targets二选一。
+
+- **纯三代**可选择上表对应配置的全部修饰。
+- **融合默认 `extended`** 仍可报告相同三代类别，但RNA002的hm5C/FormylC/o8G/m1psi及RNA004的hm5C/o8G/m1psi沿用三代证据，没有独立二代支持，输出中有证据标记。
+- **融合 `--fusion-scope common`** 只比较两代共同支持的类别；详见[完整类别与融合说明](#configurations)。
+- `Cm`不在已发布正式模型范围。RNA002三代没有Gm；RNA004三代没有Inosine或m7G。运行 `nanoremix catalog` 查询实际支持目录。
+
+<a id="start-inputs"></a>
+
+## 运行前需要哪些输入
+
+主输入为CSV/TSV，可gzip压缩；每行是一条read在一个候选中心上的观测。
+
+| 内容 | RNA002 prepared | RNA004 prepared |
+|---|---|---|
+| 序列列 `9mer_final` | 9 nt，中心第5位 | 17 nt，中心第9位，列名沿用历史名称 |
+| 四组信号列 | mean/median/std/length各5列，共20个值 | mean/median/std/length各9列，共36个值 |
+| 列名示例 | `mean_output1..5`、`median_output1..5`、`std_output1..5`、`length_output1..5` | 相同前缀，位置编号1..9 |
+| 身份字段 | 建议提供全表唯一 `record_key`，保留read、site、sample和坐标 | 同左 |
+| 融合附加输入 | 正确方向、同中心的连续81 nt，例如 `sequence81`；或者完整15类二代概率 | 同左 |
+
+同一chemistry的Binary和Multi共享prepared列格式，但需要各自的模型。信号统计和归一化必须匹配原模型；不能把RNA004裁短当RNA002。81 nt不能由短上下文拼凑，中心和中央9/17 nt须与prepared一致。独立二代概率表必须按身份键连接，不能按行号拼接。
+
+也支持预计算三代概率：`--input-kind probabilities`。Binary用对应pair概率；Multi必须提供完整原生18/16类轴。详见[完整输入格式](#inputs)。
+
+<a id="start-install"></a>
+
+## 安装与下载所需模型
+
+获取源码，在根目录安装；建议新建Python3.10/3.11环境：
 
 ```bash
 git clone https://github.com/iris982022/nanoremix_tool.git
 cd nanoremix_tool
-
 python -m venv .venv
 source .venv/bin/activate
-python -m pip install -e .
+python -m pip install -e '.[models,second]' -c constraints-models.txt
 nanoremix --version
+```
 
-nanoremix predict \
-  --input examples/minimal_binary_probabilities.csv \
-  --output results/quickstart \
-  --chemistry RNA004 --task binary --mods m6A \
+也可 **Code → Download ZIP** 后解压进入源码根目录，从创建环境开始。Windows PowerShell激活命令为 `.venv\Scripts\Activate.ps1`。
+
+从 [v0.3.0模型Release](https://github.com/iris982022/nanoremix_tool/releases/tag/v0.3.0) 选择附件，**下载后解压到项目根目录，形成 `models/`**：
+
+| 配置 | 对应三代模型下载 |
+|---|---|
+| RNA002 Binary | [RNA002_Binary ZIP](https://github.com/iris982022/nanoremix_tool/releases/download/v0.3.0/NanoRemix_v0.3.0_models_RNA002_Binary_20261104.zip) |
+| RNA002 Multi | [RNA002_Multi ZIP](https://github.com/iris982022/nanoremix_tool/releases/download/v0.3.0/NanoRemix_v0.3.0_models_RNA002_Multi_20261104.zip) |
+| RNA004 Binary | [RNA004_Binary ZIP](https://github.com/iris982022/nanoremix_tool/releases/download/v0.3.0/NanoRemix_v0.3.0_models_RNA004_Binary_20261104.zip) |
+| RNA004 Multi | [RNA004_Multi ZIP](https://github.com/iris982022/nanoremix_tool/releases/download/v0.3.0/NanoRemix_v0.3.0_models_RNA004_Multi_20261104.zip) |
+| 现场计算二代的融合 | 在对应三代包之外，再下载 [SecondGen ZIP](https://github.com/iris982022/nanoremix_tool/releases/download/v0.3.0/NanoRemix_v0.3.0_models_SecondGen_20261104.zip) |
+
+纯三代只取对应一包；已有完整二代概率时无需SecondGen。比如RNA004 Multi融合，选中两包后：
+
+```bash
+unzip -o NanoRemix_v0.3.0_models_RNA004_Multi_20261104.zip -d .
+unzip -o NanoRemix_v0.3.0_models_SecondGen_20261104.zip -d .
+
+nanoremix doctor --model-root models --model-checksums models/SHA256.json \
+  --chemistry RNA004 --task multi --mods all --strategy s2 \
+  --data-type biological --strict
+```
+
+doctor只检查资产和依赖。纯三代资产预检用 `--data-type synthetic` 选择其检查范围；实际生物样本纯三代预测仍用 `--mode thirdgen`。
+
+<a id="start-run"></a>
+
+## 按自己的配置运行
+
+下面命令需要你自己的prepared表、已解压的匹配模型；每次使用尚不存在的输出目录。`--mods`可换为上表支持的修饰子集。
+
+### 纯三代：四种配置分别运行
+
+```bash
+# RNA002 Binary：正常碱基与专用修饰pair比较
+nanoremix predict --input prepared002.csv --output results/002_binary \
+  --chemistry RNA002 --task binary --mods m6A,m5C,pseudoU \
+  --mode thirdgen --strategy s2 --model-root models \
+  --model-checksums models/SHA256.json --trust-model-files
+
+# RNA002 Multi：所有支持修饰；可改为 --mods m6A,m1A 等子集
+nanoremix predict --input prepared002.csv --output results/002_multi \
+  --chemistry RNA002 --task multi --mods all \
+  --mode thirdgen --strategy s2 --model-root models \
+  --model-checksums models/SHA256.json --trust-model-files
+
+# RNA004 Binary
+nanoremix predict --input prepared004.csv --output results/004_binary \
+  --chemistry RNA004 --task binary --mods m6A,m5C,pseudoU \
+  --mode thirdgen --strategy s2 --model-root models \
+  --model-checksums models/SHA256.json --trust-model-files
+
+# RNA004 Multi
+nanoremix predict --input prepared004.csv --output results/004_multi \
+  --chemistry RNA004 --task multi --mods all \
+  --mode thirdgen --strategy s2 --model-root models \
+  --model-checksums models/SHA256.json --trust-model-files
+```
+
+### 二代＋三代融合：四套配置均支持
+
+将相应纯三代命令的 `--mode thirdgen` 替换为 `--data-type biological --sequence-column sequence81`，使用增加了正确81 nt的对应prepared表，并额外准备SecondGen模型。RNA004 Multi示例：
+
+```bash
+nanoremix predict --input prepared004_with81.csv --output results/004_multi_fused \
+  --chemistry RNA004 --task multi --mods all \
+  --data-type biological --sequence-column sequence81 --strategy s2 \
+  --also-thirdgen --also-secondgen \
+  --model-root models --model-checksums models/SHA256.json --trust-model-files
+```
+
+此示例同时保存融合、纯三代和二代支持类别的纯二代结果。其他组合换成对应chemistry、task、prepared表和三代模型；`--mods all`自动按所选配置取支持集合。
+
+已有独立二代概率时，用 `--second-probabilities second.tsv --join-on record_key` 替换sequence-column，无需加载SecondGen。显式 `--mode fused`也可只输出融合；`--also-thirdgen/--also-secondgen`仅与data-type biological搭配。
+
+### 看结果和筛选
+
+主预测表在 `thirdgen/s2/predictions.tsv` 或 `fused/s2/predictions.tsv`；纯二代为 `secondgen/none/predictions.tsv`。检查 `predicted_label`、类别概率、`status`和 `evidence_source`；每条输入的拒绝原因在 `selection_audit.tsv`，运行参数在 `run_manifest.json`。
+
+可按验证数据预先确定 `--min-confidence`、`--min-selected-mass`、`--min-second-mass`（默认均0）。`--output-filter modified`只输出有效修饰预测。confidence是所选类别中的条件概率，不是位点修饰率；工具不自动按motif/MAPQ/coverage过滤，也不自动汇总read到site。完整条件见[参数与筛选](#options)。
+
+<a id="quickstart"></a>
+
+## 首次检查：无需权重的人工示例
+
+在上述源码目录和已安装环境中运行，不需要下载模型：
+
+```bash
+nanoremix predict --input examples/minimal_binary_probabilities.csv \
+  --output results/quickstart --chemistry RNA004 --task binary --mods m6A \
   --input-kind probabilities --mode thirdgen --strategy s2
 ```
 
-也可 **Code → Download ZIP**，解压后进入项目根目录，从创建环境开始。Windows PowerShell激活命令为 `.venv\Scripts\Activate.ps1`。每次使用新的输出目录。
+预期两行结果分别为m6A（prob_m6A=0.90）和A（prob_A=0.80），输出在 `results/quickstart/thirdgen/s2/predictions.tsv`。人工概率用于软件检查，不代表模型准确率。
 
-在 `results/quickstart/thirdgen/s2/predictions.tsv` 中预期得到：
+## 详细参考
 
-| record_key | predicted_label | prob_A | prob_m6A | confidence |
-|---|---|---:|---:|---:|
-| demo-001 | m6A | 0.10 | 0.90 | 0.90 |
-| demo-002 | A | 0.80 | 0.20 | 0.80 |
-
-这是人工概率示例，验证软件输入输出路径，不加载真实模型，也不代表生物学准确率。
+下面保留模型配置、输入、预处理、全部41个参数、公式和输出的完整说明。v0.3.1恢复了分发与自动测试文件，修复源码打包和参数文档，为旧RNA004 Step6增加显式中止检查；没有改变预测数学算法或权重。当前仍没有适用于任意新样本的通用RNA004负链转换器。
 
 <a id="configurations"></a>
 

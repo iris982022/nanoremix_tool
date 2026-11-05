@@ -17,8 +17,8 @@
     },
     {
       "path": "DISTRIBUTION.json",
-      "bytes": 1272,
-      "sha256": "bd0466a008b458683a5818e6b9a71f1dedb5ca20a054db0e61d879191956e3fd"
+      "bytes": 1278,
+      "sha256": "a1ba3cb5fc74e04c23c1ab72f32d1797aec344e51b84bf0bab6e59f3e56ce9a6"
     },
     {
       "path": "LICENSE",
@@ -32,8 +32,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 29446,
-      "sha256": "a50e464a622dfe1b6caf22aebf0fe79a8204867f3dc39d0f15559afdad85f291"
+      "bytes": 38449,
+      "sha256": "13a560c9fc05561b1b47972b83c3f1933430ff9e32f407e085cd131b02384044"
     },
     {
       "path": "SECURITY.md",
