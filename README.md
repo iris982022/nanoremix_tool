@@ -6,7 +6,7 @@
 
 源码 **v0.3.1** · 预训练模型 **v0.3.0** · 建议使用 **Python 3.10 或 3.11**
 
-[完整中文 README](docs/README.zh-CN.md) · [下载模型](https://github.com/iris982022/nanoremix_tool/releases/tag/v0.3.0) · [输入格式](docs/INPUTS.md) · [使用限制](docs/KNOWN_LIMITATIONS.zh-CN.md)
+[预处理](#3-如何准备输入) · [常用参数](#4-常用参数) · [快速上手](#5-快速上手) · [完整手册](docs/README.zh-CN.md) · [下载模型](https://github.com/iris982022/nanoremix_tool/releases/tag/v0.3.0)
 
 ## 1. NanoRemix 能做什么
 
@@ -25,11 +25,40 @@
 | [RNA004 Binary](docs/README.zh-CN.md#rna004-binary) | m6A、m5C、假尿苷（`pseudoU`），各与对应未修饰碱基比较 | 17 nt 上下文 + 36 个信号特征 |
 | [RNA004 Multi](docs/README.zh-CN.md#rna004-multi) | 12 种。m6A、m1A、Am、m5C、hm5C、ac4C、o8G、Gm、pseudoU、m1psi、m5U、Um | 17 nt 上下文 + 36 个信号特征 |
 
-Multi 在同一参考碱基家族内比较。三代使用对应试剂的序列、电流特征或预计算概率，支持 S1/S2，默认 S2。二代使用同中心的 81 nt 序列与共享 SecondGen 模型，已有完整 15 类二代概率可直接提供。融合使用两个分支的证据，无需额外进行 Illumina 测序。[各路线的输入与支持类别](docs/README.zh-CN.md#choose)
+Multi 在同一参考碱基家族内比较。三代模型使用序列和电流特征，也可直接读入预计算三代概率。二代模型使用同中心的 81 nt 序列，已有完整 15 类二代概率可直接提供。融合使用两个分支的证据，无需额外进行 Illumina 测序。[各路线的输入与支持类别](docs/README.zh-CN.md#choose)
 
-> 手头只有 FAST5 / POD5 时，请先完成 basecalling、比对和特征提取。内置 RNA004 旧 Step6 转换仅接受显式正链表，RNA004 正负链均可在正确准备特征后用于预测。[上游流程](docs/README.zh-CN.md#preprocessing) · [RNA004 使用限制](docs/KNOWN_LIMITATIONS.zh-CN.md)
+## 3. 如何准备输入
 
-## 3. 快速上手
+从 FAST5 或 POD5 开始时，先用对应的上游工具完成 basecalling、比对和信号特征提取。已有规范特征表或概率表时，可直接进入预测。
+
+| 原始数据 | 上游步骤 | NanoRemix 转换 |
+| --- | --- | --- |
+| RNA002 FAST5 | Guppy（`--fast5_out`）→ 拆成单 read FAST5 → Tombo/GraphMap → 提取 Step4 TSV 和坐标侧表 | `prepare --chemistry RNA002 --format step4`，生成 9 nt 上下文和 20 个信号值 |
+| RNA004 POD5 | Dorado（`--emit-moves`）→ 比对并排序 BAM → Remora 提取信号特征 → 合并为 Step6 CSV | `prepare --chemistry RNA004 --format step6`，从正链 Step6 生成 17 nt 上下文和 36 个信号值 |
+
+特征表使用带表头的 CSV/TSV，可 gzip 压缩。`9mer_final` 保存短序列上下文，四组信号列为 `mean_output1…K`、`median_output1…K`、`std_output1…K` 和 `length_output1…K`，RNA002 的 K=5，RNA004 的 K=9。按序列做融合时另需同中心、同方向的 81 nt 序列。[完整预处理命令](docs/README.zh-CN.md#preprocessing) · [输入字段与示例](docs/README.zh-CN.md#inputs)
+
+> RNA004 的旧 Step6 转换要求显式 `strand=+`。负链数据需要先用经过验证的流程构造符合规范的 prepared 表，再运行预测。[RNA004 使用限制](docs/KNOWN_LIMITATIONS.zh-CN.md)
+
+## 4. 常用参数
+
+以下选项用于 `predict`，也适用于 `validate`。用 `--input` 指定输入表，预测时用 `--output` 指定新目录。
+
+| 参数 | 怎么选 |
+| --- | --- |
+| `--chemistry RNA002` / `RNA004` | 选实验使用的试剂版本。 |
+| `--task binary` / `multi` | 选修饰与未修饰配对，或同一参考碱基家族内的多类比较。 |
+| `--mods m6A,m5C` / `all` | 选修饰列表或当前路线支持的全部修饰，默认加入同家族未修饰对照。Multi 可用 `--targets` 直接列出参与比较的类别。 |
+| `--mode thirdgen` / `--data-type biological` | 分别运行纯三代或融合。`--mode` 与 `--data-type` 二选一。 |
+| `--strategy s1` / `s2` / `both` | 默认 `s2`，`both` 分别输出两种策略的结果。 |
+| `--input-kind features` / `probabilities` | 默认读特征表。已有三代概率时选 `probabilities`。 |
+| `--sequence-column sequence81` | 指定用于二代推理的 81 nt 序列列。已有独立二代概率表时可用 `--second-probabilities` 和 `--join-on` 按观测键匹配。 |
+| `--model-root models` | 指定模型根目录。加载已核实的权重时需同时使用 `--trust-model-files`，可用 `--model-checksums models/SHA256.json` 检查文件。 |
+| `--min-confidence 0.8` / `--output-filter modified` | 分别设置获胜类别的条件概率下限、仅保存已接受的修饰预测。这里的 0.8 是示例，默认下限为 0，默认保存所有候选。 |
+
+[全部参数、默认值和使用条件](docs/README.zh-CN.md#options)
+
+## 5. 快速上手
 
 用两条人工概率记录检查安装。这个示例无需下载模型权重。
 
@@ -48,11 +77,8 @@ nanoremix predict --input examples/minimal_binary_probabilities.csv \
 
 在 `results/quickstart/thirdgen/s2/predictions.tsv` 中可看到两条预测，依次为 `m6A` 和 `A`。每次运行请选择新的输出目录。
 
-## 4. 运行自己的数据
+## 6. 运行自己的数据
 
-1. 将原始数据转换为特征表，或从已有特征表和概率表开始。[原始数据预处理](docs/README.zh-CN.md#preprocessing)
-2. 核对列名、候选身份与融合所需的 81 nt 上下文或二代概率。[文件格式与示例](docs/README.zh-CN.md#inputs)
-3. 安装对应模型，先检查，再按所选配置预测。[安装与模型预检](docs/README.zh-CN.md#start-install) · [四套配置的运行命令](docs/README.zh-CN.md#start-run)
-4. 核查审计状态、预测标签和证据来源，再进行比较或汇总。[结果分析](docs/README.zh-CN.md#outputs)
-
-[所有命令的参数、默认值与允许值](docs/README.zh-CN.md#options) · [融合计算](docs/README.zh-CN.md#calculation)
+1. 按试剂和任务安装对应模型，用 `doctor` 检查文件和依赖。[安装与模型预检](docs/README.zh-CN.md#start-install)
+2. 用 `validate` 检查输入和推理，再用 `predict` 保存结果。[四套配置的运行命令](docs/README.zh-CN.md#start-run)
+3. 查看 `predictions.tsv`、`selection_audit.tsv` 和 `run_manifest.json`，核对候选状态、预测标签和运行参数后再汇总。[结果分析](docs/README.zh-CN.md#outputs)
