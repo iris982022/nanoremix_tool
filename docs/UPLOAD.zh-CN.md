@@ -21,7 +21,9 @@ verification/...
 .github/workflows/tests.yml
 ```
 
-根目录README已含全部功能、四套配置、支持修饰、输入、上游流程、安装、运行、全部41个参数、筛选计算和限制。GitHub会自动将它显示在主页；另外提供的README副本与ZIP中相同，只需在仓库保留一份README.md。
+GitHub 在仓库首页显示根目录 README，读者可以从这里查看四套配置并运行快速示例。[首页 README](../README.md)
+
+完整中文 README 位于 `docs/`，收录支持修饰、输入、上游流程、模型安装、运行命令、全部 41 个参数、筛选计算和使用限制。[完整中文 README](README.zh-CN.md)
 
 GitHub不会自动展开ZIP：仅上传ZIP时，不能直接浏览里面的源文件，也不会自动显示ZIP内README。只更新README可先改善主页，但不能修复源码结构或补齐权重。
 
@@ -43,7 +45,7 @@ Git没有网页上传器的100文件批次限制。重整结构会同时删除�
 
 上传解压后项目内容并保留子目录。提交前必须在预览中看到 `src/nanoremix/cli.py` 等正确路径；如果只有cli.py等文件名在根目录，先取消上传。网页批次若因删除与新增数量或浏览器行为无法完成，使用上面的Desktop方式。
 
-只先改主页：打开根目录 **README.md → 铅笔 Edit this file**，用本次提供的README全文替换，然后 **Commit changes**。完整功能运行仍需修复目录并补齐模型下载。
+更新主页时，可在 GitHub 打开根目录 `README.md`，通过 **Edit this file** 修改后提交。首页与手册的链接使用仓库内相对路径。
 
 ## 4. 本次不重传模型
 

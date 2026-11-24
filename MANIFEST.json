@@ -17,8 +17,8 @@
     },
     {
       "path": "DISTRIBUTION.json",
-      "bytes": 1473,
-      "sha256": "0e8cebb65212dcf4b57cd0b3225b359288c931a3a4805ec28dcf526cfe7c7c8f"
+      "bytes": 1485,
+      "sha256": "b0a05dff8412bd03a8c0375fb623c77ad056d2925ebdd1c6b52611cae3c3546a"
     },
     {
       "path": "LICENSE",
@@ -32,8 +32,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 45747,
-      "sha256": "5a5d7e046a77c80289a38e1ddf06947bf48dd1849b853003a566b2a43fef2688"
+      "bytes": 3756,
+      "sha256": "21b0cf0bb8d61378f3dce47dec479755ed8f568e5f99c3556891718fde0d3092"
     },
     {
       "path": "SECURITY.md",
@@ -42,8 +42,8 @@
     },
     {
       "path": "START_HERE.zh-CN.md",
-      "bytes": 1138,
-      "sha256": "ebc7222e0a8aac5847ed7a539fe4b5bc400e668123e0d56f6cee1b81559d50ff"
+      "bytes": 1202,
+      "sha256": "d1cc2039c4ac5768dc3f1817c7f314c4acfc5d09c085eca0b967f54918dfb537"
     },
     {
       "path": "constraints-models.txt",
@@ -77,13 +77,13 @@
     },
     {
       "path": "docs/README.zh-CN.md",
-      "bytes": 7554,
-      "sha256": "a1ca1dfba3342fa14734992a804b7e277fc5b302f7daac151c979e58d9656464"
+      "bytes": 45779,
+      "sha256": "6bd4eed488b10324dc4fdd08d5d9714388e74d83e32b48ee840d5ab08becbd0e"
     },
     {
       "path": "docs/UPLOAD.zh-CN.md",
-      "bytes": 3552,
-      "sha256": "cbc177063e1090b165fc2ac546cde45d52892d7867698c88a894e87fd81e75f9"
+      "bytes": 3577,
+      "sha256": "04da342adb1fceeee90bc843d262329a1c65ef8088c4cd9991f3b07bd13e16f5"
     },
     {
       "path": "docs/guide_20261104/CLI_help.txt",
