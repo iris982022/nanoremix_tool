@@ -1,18 +1,34 @@
-# NanoRemix
+<h1 align="center">NanoRemix</h1>
 
-**从 Oxford Nanopore RNA002 / RNA004 直接 RNA 测序数据预测 RNA 修饰。**
+<p align="center"><strong>Oxford Nanopore 直接 RNA 测序的逐 read 修饰预测</strong></p>
 
-[![软件测试](https://github.com/iris982022/nanoremix_tool/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/iris982022/nanoremix_tool/actions/workflows/tests.yml)
+<p align="center">
+  RNA002 与 RNA004 · Binary 与 Multi · Nanopore 信号与序列融合
+</p>
 
-源码 **v0.3.1** · 预训练模型 **v0.3.0** · 建议使用 **Python 3.10 或 3.11**
+<p align="center">
+  <a href="https://github.com/iris982022/nanoremix_tool/actions/workflows/tests.yml"><img src="https://github.com/iris982022/nanoremix_tool/actions/workflows/tests.yml/badge.svg?branch=main" alt="GitHub Actions 软件测试"></a>
+  <br>
+  源码 <strong>v0.3.1</strong> · 模型 <strong>v0.3.0</strong> · 建议 Python <strong>3.10 / 3.11</strong>
+</p>
 
-[预处理](#3-如何准备输入) · [常用参数](#4-常用参数) · [快速上手](#5-快速上手) · [完整手册](docs/README.zh-CN.md) · [下载模型](https://github.com/iris982022/nanoremix_tool/releases/tag/v0.3.0)
+<div align="center">
+
+[功能与支持范围](#2-支持哪些试剂和修饰) · [预处理](#3-如何准备输入) · [参数速查](#4-常用参数) · [快速上手](#5-快速上手) · [运行模型](#6-运行自己的数据)
+
+**[完整中文手册](docs/README.zh-CN.md)** · **[模型下载](https://github.com/iris982022/nanoremix_tool/releases/tag/v0.3.0)**
+
+</div>
+
+---
 
 ## 1. NanoRemix 能做什么
 
-- 用 `prepare` 把 RNA002 的 Step4/extracted 特征表或 RNA004 的正链 Step6 表转换成预测输入。
-- 用 `catalog` 查询支持类别，用 `doctor` 检查模型与依赖，用 `validate` 试跑并检查输入。
-- 用 `predict` 运行纯三代、二代＋三代融合或纯二代预测，输出逐 read 候选的标签、概率、筛选记录和运行清单。
+| 我想做什么 | 命令 | 会得到什么 |
+| --- | --- | --- |
+| 把已有信号特征整理成模型输入 | `prepare` | RNA002 Step4/extracted 或 RNA004 正链 Step6 转出的特征表 |
+| 先核对支持范围和运行条件 | `catalog`、`doctor`、`validate` | 类别清单、模型与依赖预检、输入与推理试跑结果 |
+| 跑纯三代、二代＋三代融合或纯二代 | `predict` | 逐 read 候选的标签和概率，以及筛选记录与运行清单 |
 
 ## 2. 支持哪些试剂和修饰
 
@@ -25,19 +41,34 @@
 | [RNA004 Binary](docs/README.zh-CN.md#rna004-binary) | m6A、m5C、假尿苷（`pseudoU`），各与对应未修饰碱基比较 | 17 nt 上下文 + 36 个信号特征 |
 | [RNA004 Multi](docs/README.zh-CN.md#rna004-multi) | 12 种。m6A、m1A、Am、m5C、hm5C、ac4C、o8G、Gm、pseudoU、m1psi、m5U、Um | 17 nt 上下文 + 36 个信号特征 |
 
-Multi 在同一参考碱基家族内比较。三代模型使用序列和电流特征，也可直接读入预计算三代概率。二代模型使用同中心的 81 nt 序列，已有完整 15 类二代概率可直接提供。融合使用两个分支的证据，无需额外进行 Illumina 测序。[各路线的输入与支持类别](docs/README.zh-CN.md#choose)
+Multi 在同一参考碱基家族内比较所选类别，使用 `--mods` 时默认加入相应未修饰对照。以下是两种常用路线。
+
+- **只有 Nanopore 特征或三代概率**，选 `--mode thirdgen`。
+- **还想结合序列证据**，选 `--data-type biological`。另提供同中心的 **81 nt** 序列与 SecondGen 模型，或完整的 **15 类二代概率**。融合无需额外进行 Illumina 测序。[全部预测路线](docs/README.zh-CN.md#choose)
 
 ## 3. 如何准备输入
 
-从 FAST5 或 POD5 开始时，先用对应的上游工具完成 basecalling、比对和信号特征提取。已有规范特征表或概率表时，可直接进入预测。
+从 FAST5 或 POD5 开始，先在上游完成 basecalling、比对和信号提取。已有规范特征表或概率表时，可直接运行 `predict`。
 
-| 原始数据 | 上游步骤 | NanoRemix 转换 |
-| --- | --- | --- |
-| RNA002 FAST5 | Guppy（`--fast5_out`）→ 拆成单 read FAST5 → Tombo/GraphMap → 提取 Step4 TSV 和坐标侧表 | `prepare --chemistry RNA002 --format step4`，生成 9 nt 上下文和 20 个信号值 |
-| RNA004 POD5 | Dorado（`--emit-moves`）→ 比对并排序 BAM → Remora 提取信号特征 → 合并为 Step6 CSV | `prepare --chemistry RNA004 --format step6`，从正链 Step6 生成 17 nt 上下文和 36 个信号值 |
+```mermaid
+flowchart LR
+    r2["RNA002 · FAST5"] --> u2["Guppy → 单 read FAST5<br/>→ Tombo / GraphMap"] --> s2["Step4 TSV<br/>＋ 坐标侧表"]
+    r4["RNA004 · POD5"] --> u4["Dorado → 排序 BAM<br/>→ Remora"] --> s4["正链 Step6 CSV"]
+    s2 -->|prepare| ready["Prepared 特征表"]
+    s4 -->|prepare| ready
+    ready --> predict["NanoRemix predict"]
+    classDef input fill:#075985,stroke:#38bdf8,color:#fff
+    classDef result fill:#0f766e,stroke:#2dd4bf,color:#fff
+    class r2,r4 input
+    class ready,predict result
+```
 
-特征表使用带表头的 CSV/TSV，可 gzip 压缩。`9mer_final` 保存短序列上下文，四组信号列为 `mean_output1…K`、`median_output1…K`、`std_output1…K` 和 `length_output1…K`，RNA002 的 K=5，RNA004 的 K=9。按序列做融合时另需同中心、同方向的 81 nt 序列。[完整预处理命令](docs/README.zh-CN.md#preprocessing) · [输入字段与示例](docs/README.zh-CN.md#inputs)
+- **RNA002** 用 Guppy 的 `--fast5_out` 保留 basecalled FAST5，提取后保留 Step4 TSV 与同步坐标侧表。转换时指定 `--chemistry RNA002 --format step4`。
+- **RNA004** 用 Dorado 的 `--emit-moves` 保留信号定位所需的 move table，合并 Remora 特征得到 Step6 CSV。转换时指定 `--chemistry RNA004 --format step6`。
 
+两个转换命令均使用 `nanoremix prepare --input <上游表> --output <新文件>`。特征表使用带表头的 CSV/TSV，可 gzip 压缩。`9mer_final` 保存短序列上下文，信号为 mean、median、std、length 四组列，每组 RNA002 有 5 列、RNA004 有 9 列。[上游命令和格式示例](docs/README.zh-CN.md#preprocessing) · [预测输入字段](docs/README.zh-CN.md#inputs)
+
+> [!IMPORTANT]
 > RNA004 的旧 Step6 转换要求显式 `strand=+`。负链数据需要先用经过验证的流程构造符合规范的 prepared 表，再运行预测。[RNA004 使用限制](docs/KNOWN_LIMITATIONS.zh-CN.md)
 
 ## 4. 常用参数
@@ -79,6 +110,23 @@ nanoremix predict --input examples/minimal_binary_probabilities.csv \
 
 ## 6. 运行自己的数据
 
-1. 按试剂和任务安装对应模型，用 `doctor` 检查文件和依赖。[安装与模型预检](docs/README.zh-CN.md#start-install)
-2. 用 `validate` 检查输入和推理，再用 `predict` 保存结果。[四套配置的运行命令](docs/README.zh-CN.md#start-run)
-3. 查看 `predictions.tsv`、`selection_audit.tsv` 和 `run_manifest.json`，核对候选状态、预测标签和运行参数后再汇总。[结果分析](docs/README.zh-CN.md#outputs)
+以下以 **RNA004 Binary → m6A → 纯三代 S2** 为例。先从 Release 下载 RNA004 Binary ZIP，解压到仓库根目录生成 `models/`。命令用仓库附带的人工特征表调用发布模型；运行自己的样本时，将 `--input` 换成同格式的特征表。[下载 RNA004 Binary 模型](https://github.com/iris982022/nanoremix_tool/releases/download/v0.3.0/NanoRemix_v0.3.0_models_RNA004_Binary_20261104.zip) · [安装与模型预检](docs/README.zh-CN.md#start-install)
+
+```bash
+python -m pip install -e '.[models]' -c constraints-models.txt
+
+nanoremix predict \
+  --input docs/guide_20261104/examples/RNA004_prepared_with81.csv \
+  --chemistry RNA004 --task binary --mods m6A \
+  --mode thirdgen --strategy s2 \
+  --model-root models --model-checksums models/SHA256.json --trust-model-files \
+  --output results/rna004_m6a
+```
+
+| 文件（位于 `results/rna004_m6a/`） | 查看什么 |
+| --- | --- |
+| `thirdgen/s2/predictions.tsv` | 预测标签、类别概率和置信度 |
+| `thirdgen/s2/selection_audit.tsv` | 全部输入候选的处理状态及筛选原因 |
+| `run_manifest.json` | 实际运行的模式、策略、类别、输入和模型哈希 |
+
+[四套配置的完整命令](docs/README.zh-CN.md#start-run) · [结果分析](docs/README.zh-CN.md#outputs)
