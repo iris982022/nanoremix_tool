@@ -5,6 +5,7 @@ Normal use needs `--input`, `--output` and `--task`; explicitly choose
 and exactly one of `--data-type` / `--mode` are required. The defaults are
 prepared feature input and strategy S2.
 Use `nanoremix predict --help` for the full command reference.
+The Chinese manual lists every option with its accepted values, default, and dependencies. [Complete CLI reference](README.zh-CN.md#options)
 
 ## Supported Modifications
 

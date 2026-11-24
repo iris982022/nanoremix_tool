@@ -4,7 +4,7 @@
 
 仓库首页提供功能概览、四套配置和无权重快速示例。[首页 README](README.md)
 
-完整中文 README 收录输入格式、上游流程、安装、模型下载、运行命令、全部 41 个 `predict`/`validate` 长选项、筛选计算和输出说明。[完整中文 README](docs/README.zh-CN.md)
+完整中文 README 按配置选择、预处理、输入格式、安装预检、预测及结果分析编号。参数参考包含根命令、`prepare`、`catalog`、`doctor` 及 `predict`/`validate` 的全部选项。[完整中文 README](docs/README.zh-CN.md) · [全部 CLI 参数](docs/README.zh-CN.md#options)
 
 - [完整技术手册](docs/guide_20261104/README_版本输入预处理参数与计算.md)：字段、版本依据、预处理和公式。
 - [上游命令模板](docs/guide_20261104/PIPELINE_命令与输入衔接.md)：RNA002/RNA004分阶段流程。

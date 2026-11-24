@@ -13,6 +13,6 @@
   "web_upload_stores_archive_without_extracting": true,
   "compact_package_note": "99 project files with the original src/docs directory hierarchy. The root README provides a quick start. docs/README.zh-CN.md contains complete usage and all 41 predict/validate long options. Model weights are distributed as separate Release ZIPs.",
   "source_archive": "NanoRemix_GitHub_source.zip",
-  "documentation_update": "The home page describes the four configurations, model routes and a weight-free example. The full Chinese README covers modification lists, input formats, preprocessing, model downloads, commands, options, outputs and fusion calculations.",
+  "documentation_update": "The numbered home page lists supported features and modifications. The Chinese README follows preprocessing, input preparation, model checks, prediction, and output analysis. It includes every CLI option with accepted values and defaults.",
   "model_release": "https://github.com/iris982022/nanoremix_tool/releases/tag/v0.3.0"
 }
